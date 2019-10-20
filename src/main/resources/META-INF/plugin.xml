@@ -10,6 +10,7 @@
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <!-- uncomment to enable plugin in all products-->
+    <depends>com.intellij.modules.platform</depends>
     <depends>JavaScript</depends>
 
 
@@ -18,9 +19,9 @@
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
-        <action id="Test" class="Test" text="MyName">
+        <group id="LogIt.SampleMenu" text="Greeting" description="Greeting menu">
             <add-to-group group-id="MainMenu" anchor="last"/>
-        </action>
+            <action id="LogIt.Textboxes" class="Test" text="Hello" description="Says hello"/>
+        </group>
     </actions>
 </idea-plugin>
