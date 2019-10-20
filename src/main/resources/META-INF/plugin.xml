@@ -1,0 +1,26 @@
+<idea-plugin>
+    <id>org.lso.logit</id>
+    <name>LogIt</name>
+    <vendor email="laurent.soulet@gmail.com" url="https://github.com/lso133/logit">Laurent SOULET</vendor>
+
+    <description><![CDATA[
+    A Webstorm plugin to quickly insert console.log
+    ]]></description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products-->
+    <depends>JavaScript</depends>
+
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="Test" class="Test" text="MyName">
+            <add-to-group group-id="MainMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
