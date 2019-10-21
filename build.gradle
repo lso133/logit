@@ -8,10 +8,15 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs 'lib'
+    }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "com.intellij.lang:javascript-openapi"
+    implementation "com.intellij.lang:JavaScriptLanguage"
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/

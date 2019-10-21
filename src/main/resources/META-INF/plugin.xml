@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>org.lso.logit</id>
-    <name>LogIt</name>
+    <name>LogItAdd</name>
     <vendor email="laurent.soulet@gmail.com" url="https://github.com/lso133/logit">Laurent SOULET</vendor>
 
     <description><![CDATA[
@@ -19,9 +19,17 @@
     </extensions>
 
     <actions>
-        <group id="LogIt.SampleMenu" text="Greeting" description="Greeting menu">
-            <add-to-group group-id="MainMenu" anchor="last"/>
-            <action id="LogIt.Textboxes" class="Test" text="Hello" description="Says hello"/>
+        <group id="org.lso.LogIt.LogItActionsGroup" class="LogItActionsGroup" text="Log It"
+               description="Generate javascript logs" popup="true">
+            <add-to-group group-id="CodeMenu" anchor="last"/>
+            <action id="org.lso.LogIt.addLog" class="LogItAdd" text="Generate Console.Log"
+                    description="Generate a console.log() for that variable">
+                <keyboard-shortcut keymap="$default" first-keystroke="meta L"/>
+            </action>
+            <action id="org.lso.LogIt.deleteLogs" class="LogItDelete" text="Generate Console.Log"
+                    description="Generate a console.log() for that variable">
+                <keyboard-shortcut keymap="$default" first-keystroke="meta U"/>
+            </action>
         </group>
     </actions>
 </idea-plugin>
