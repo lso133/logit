@@ -1,30 +1,18 @@
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.LangDataKeys
-import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.editor.impl.CaretImpl
-import com.intellij.openapi.editor.impl.EditorComponentImpl
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorImpl
-import com.intellij.openapi.wm.IdeFocusManager
+import com.intellij.ide.DataManager
+import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.editor.actionSystem.EditorAction
+import com.intellij.psi.util.PsiUtilCore
 
 class LogItAdd : AnAction("Insert log") {
     override fun actionPerformed(e: AnActionEvent) {
-        e.project?.let { project ->
-            (FileEditorManager.getInstance(project).selectedEditor as PsiAwareTextEditorImpl).editor.let { editor ->
-                val selection = (editor.caretModel.primaryCaret as CaretImpl).selectedText
-                val psi = e.getData(LangDataKeys.PSI_ELEMENT)
-                WriteCommandAction.runWriteCommandAction(project) {
-                    editor.document.insertString(0, "coucou")
-                }
-            }
-        }
-    }
-
-    override fun update(e: AnActionEvent) {
-        e.project?.let { project ->
-            val editorHasFocus = IdeFocusManager.getInstance(project).focusOwner is EditorComponentImpl
-            e.presentation.isEnabled = editorHasFocus
+        e.getData(PlatformDataKeys.PSI_ELEMENT)?.let {
+            val editor = e.getData(PlatformDataKeys.EDITOR)
+            val name = PsiUtilCore.getName(it)
+            val dataContext = DataManager.getInstance().getDataContext(editor?.component);
+            val action = ActionManager.getInstance()
+                .getAction(IdeActions.ACTION_EDITOR_START_NEW_LINE) as EditorAction
+            action.actionPerformed(editor, dataContext)
+//            val toto = EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_START_NEW_LINE);
         }
     }
 }
