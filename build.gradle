@@ -15,8 +15,9 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "com.intellij.lang:javascript-openapi"
-    implementation "com.intellij.lang:JavaScriptLanguage"
+    compileOnly "com.intellij.lang:javascript-openapi"
+    compileOnly "com.intellij.lang:JavaScriptLanguage"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.3.50"
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
