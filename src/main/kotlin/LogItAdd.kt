@@ -36,27 +36,31 @@ class LogItAdd : AnAction("Insert log") {
 
     private fun insertTheNewLine(editor: Editor, element: PsiElement): Pair<Int, String?> {
         val expression =
-            element.parentOfType(
-                JSVarStatement::class,
-                JSExpressionStatement::class,
-                JSAssignmentExpression::class
-            )
+            if (element.node.elementType.toString() == "WHITE_SPACE")
+                element
+            else
+                element.parentOfType(
+                    JSVarStatement::class,
+                    JSExpressionStatement::class,
+                    JSAssignmentExpression::class
+                )
+        checkNotNull(expression)
 
-        val variable = expression?.let {
+        val variable =
+            if (expression.text.trim().isEmpty()) "rien"
+            else {
+                editor.caretModel.moveToOffset(expression.textRange.endOffset)
+                findIdentifier(expression).text
+            }
 
-            editor.caretModel.moveToOffset(expression.textRange.endOffset)
+        val dataContext = DataManager.getInstance().getDataContext(editor.component)
 
-            val dataContext = DataManager.getInstance().getDataContext(editor.component)
-
-            val action = ActionManager.getInstance()
-                .getAction(IdeActions.ACTION_EDITOR_START_NEW_LINE) as EditorAction
-            action.actionPerformed(editor, dataContext)
-
-            findIdentifier(expression)
-        }
+        val action = ActionManager.getInstance()
+            .getAction(IdeActions.ACTION_EDITOR_START_NEW_LINE) as EditorAction
+        action.actionPerformed(editor, dataContext)
 
         val caret = editor.caretModel.currentCaret
-        return Pair(caret.offset, variable?.text)
+        return Pair(caret.offset, variable)
     }
 }
 
