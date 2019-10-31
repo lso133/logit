@@ -1,59 +1,77 @@
 import com.intellij.ide.DataManager
+import com.intellij.lang.javascript.JavascriptLanguage
+import com.intellij.lang.javascript.psi.JSAssignmentExpression
+import com.intellij.lang.javascript.psi.JSExpressionStatement
+import com.intellij.lang.javascript.psi.JSVarStatement
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorAction
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiUtilCore
+import com.intellij.psi.PsiFileFactory
+import com.intellij.psi.util.parentOfType
 
 
 class LogItAdd : AnAction("Insert log") {
     override fun actionPerformed(e: AnActionEvent) {
-        e.getData(LangDataKeys.PSI_FILE)?.let { psiFile ->
-            e.getData(PlatformDataKeys.EDITOR)?.let { editor ->
+        e.getData(PlatformDataKeys.EDITOR)?.let { editor ->
 
-                val offset = editor.caretModel.currentCaret.offset
-                psiFile.findElementAt(offset)?.let {
-                    val newOffset = insertNewLine(editor, it)
+            val psiFile =
+                PsiFileFactory.getInstance(e.project).createFileFromText(
+                    "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
+                )
 
-                    WriteCommandAction.runWriteCommandAction(e.project) {
-                        val line = "console.log(\"toto\")"
-                        editor.document.insertString(newOffset, line)
-                    }
+            val offset = editor.caretModel.currentCaret.offset
+
+            psiFile.findElementAt(offset)?.let { element ->
+                val (newOffset, variableName) = insertTheNewLine(editor, element)
+
+                WriteCommandAction.runWriteCommandAction(e.project) {
+                    val line = "console.log(\"$variableName\");"
+                    editor.document.insertString(newOffset, line)
                 }
             }
         }
     }
 
-    private fun getVariableName(element: PsiElement): String {
-        return PsiUtilCore.getName(element)
-    }
+    private fun insertTheNewLine(editor: Editor, element: PsiElement): Pair<Int, String?> {
+        val expression =
+            element.parentOfType(
+                JSVarStatement::class,
+                JSExpressionStatement::class,
+                JSAssignmentExpression::class
+            )
 
-    private fun insertNewLine(editor: Editor, element: PsiElement): Int {
-        val expression = element.getParentBlock()
+        val variable = expression?.let {
 
-        editor.caretModel.moveToOffset(expression.textRange.endOffset)
+            editor.caretModel.moveToOffset(expression.textRange.endOffset)
 
-        val dataContext = DataManager.getInstance().getDataContext(editor.component);
+            val dataContext = DataManager.getInstance().getDataContext(editor.component)
 
-        val action = ActionManager.getInstance()
-            .getAction(IdeActions.ACTION_EDITOR_START_NEW_LINE) as EditorAction
-        action.actionPerformed(editor, dataContext)
+            val action = ActionManager.getInstance()
+                .getAction(IdeActions.ACTION_EDITOR_START_NEW_LINE) as EditorAction
+            action.actionPerformed(editor, dataContext)
+
+            findIdentifier(expression)
+        }
 
         val caret = editor.caretModel.currentCaret
-
-        return caret.offset
+        return Pair(caret.offset, variable?.text)
     }
+}
 
-    private fun PsiElement.getParentBlock(): PsiElement {
-        val t = this.javaClass.kotlin.simpleName
-        // val interfaces = this.javaClass.interfaces.map { it.name.split(".").last() }
-        if (AllowedParent.contains(t)) return this
+private fun findIdentifier(element: PsiElement): PsiElement {
 
-        return this.parent.getParentBlock()
-    }
+    val elementType = element.node.elementType.toString()
+    if (elementType == "JS:DEFINITION_EXPRESSION" ||
+        elementType == "JS:IDENTIFIER" ||
+        (elementType == "JS:REFERENCE_EXPRESSION"
+                && element.parent.node.elementType.toString() == "JS:REFERENCE_EXPRESSION")
+    ) return element
 
-    companion object {
-        private val AllowedParent = listOf("JSVarStatementImpl", "JSCallExpressionImpl")
-    }
+    var child = element.firstChild
+
+    if (child == null) child = findIdentifier(element.nextSibling)
+
+    return findIdentifier(child)
 }
