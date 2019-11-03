@@ -1,8 +1,6 @@
 import com.intellij.ide.DataManager
 import com.intellij.lang.javascript.JavascriptLanguage
-import com.intellij.lang.javascript.psi.JSAssignmentExpression
-import com.intellij.lang.javascript.psi.JSExpressionStatement
-import com.intellij.lang.javascript.psi.JSVarStatement
+import com.intellij.lang.javascript.psi.*
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
@@ -24,7 +22,8 @@ class LogItAdd : AnAction("Insert log") {
             val offset = editor.caretModel.currentCaret.offset
 
             psiFile.findElementAt(offset)?.let { element ->
-                val (newOffset, variableName) = insertTheNewLine(editor, element)
+                val el = findIdentifierForElement(element)
+                val (newOffset, variableName) = insertTheNewLine(editor, element, el?.text)
 
                 WriteCommandAction.runWriteCommandAction(e.project) {
                     val line = "console.log(\"$variableName\");"
@@ -34,7 +33,11 @@ class LogItAdd : AnAction("Insert log") {
         }
     }
 
-    private fun insertTheNewLine(editor: Editor, element: PsiElement): Pair<Int, String?> {
+    private fun insertTheNewLine(
+        editor: Editor,
+        element: PsiElement,
+        identifier: String?
+    ): Pair<Int, String?> {
         val expression =
             if (element.node.elementType.toString() == "WHITE_SPACE")
                 element
@@ -42,15 +45,25 @@ class LogItAdd : AnAction("Insert log") {
                 element.parentOfType(
                     JSVarStatement::class,
                     JSExpressionStatement::class,
-                    JSAssignmentExpression::class
+                    JSAssignmentExpression::class,
+                    JSIfStatement::class
                 )
         checkNotNull(expression)
 
         val variable =
-            if (expression.text.trim().isEmpty()) "rien"
-            else {
-                editor.caretModel.moveToOffset(expression.textRange.endOffset)
-                findIdentifier(expression).text
+            when {
+                expression.text.trim().isEmpty() -> "rien"
+                expression is JSIfStatement -> {
+                    // for "if" statements insert line above
+                    editor.caretModel.moveToOffset(expression.prevSibling.textRange.startOffset - 1)
+                    element.parentOfType(JSReferenceExpression::class)?.let {
+                        identifier ?: findIdentifierForExpression(it).text
+                    }
+                }
+                else -> {
+                    editor.caretModel.moveToOffset(expression.textRange.endOffset)
+                    identifier ?: findIdentifierForExpression(expression).text
+                }
             }
 
         val dataContext = DataManager.getInstance().getDataContext(editor.component)
@@ -62,20 +75,36 @@ class LogItAdd : AnAction("Insert log") {
         val caret = editor.caretModel.currentCaret
         return Pair(caret.offset, variable)
     }
+
+    private fun findIdentifierForElement(element: PsiElement): PsiElement? {
+        val elementType = element.node.elementType.toString()
+        when {
+            elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION" -> return null
+            element.prevSibling != null
+                    && element.prevSibling.node.elementType.toString() == "JS:DOT"
+            -> return findIdentifierForElement(element.parent)
+        }
+
+        return element
+    }
+
+    private fun findIdentifierForExpression(expression: PsiElement): PsiElement {
+
+        val elementType = expression.node.elementType.toString()
+        if (elementType == "JS:DEFINITION_EXPRESSION" ||
+            elementType == "JS:IDENTIFIER" ||
+            elementType == "JS:THIS_EXPRESSION" ||
+            (elementType == "JS:REFERENCE_EXPRESSION"
+                    && expression.parent.node.elementType.toString() == "JS:REFERENCE_EXPRESSION") ||
+            (elementType == "JS:REFERENCE_EXPRESSION"
+                    && expression.parent.node.elementType.toString() == "JS:BINARY_EXPRESSION")
+        ) return expression
+
+        var child = expression.firstChild
+
+        if (child == null) child = findIdentifierForExpression(expression.nextSibling)
+
+        return findIdentifierForExpression(child)
+    }
 }
 
-private fun findIdentifier(element: PsiElement): PsiElement {
-
-    val elementType = element.node.elementType.toString()
-    if (elementType == "JS:DEFINITION_EXPRESSION" ||
-        elementType == "JS:IDENTIFIER" ||
-        (elementType == "JS:REFERENCE_EXPRESSION"
-                && element.parent.node.elementType.toString() == "JS:REFERENCE_EXPRESSION")
-    ) return element
-
-    var child = element.firstChild
-
-    if (child == null) child = findIdentifier(element.nextSibling)
-
-    return findIdentifier(child)
-}
