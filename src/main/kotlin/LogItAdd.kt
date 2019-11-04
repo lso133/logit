@@ -14,6 +14,7 @@ class LogItAdd : AnAction("Insert log") {
     override fun actionPerformed(e: AnActionEvent) {
         e.getData(PlatformDataKeys.EDITOR)?.let { editor ->
 
+            // parse the file as a simple JavaScript file
             val psiFile =
                 PsiFileFactory.getInstance(e.project).createFileFromText(
                     "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
@@ -38,16 +39,17 @@ class LogItAdd : AnAction("Insert log") {
         element: PsiElement,
         identifier: String?
     ): Pair<Int, String?> {
-        val expression =
-            if (element.node.elementType.toString() == "WHITE_SPACE")
-                element
-            else
-                element.parentOfType(
-                    JSVarStatement::class,
-                    JSExpressionStatement::class,
-                    JSAssignmentExpression::class,
-                    JSIfStatement::class
-                )
+        val expression = let {
+
+            val el = if (element.node.elementType.toString() == "WHITE_SPACE") element.prevSibling else element
+
+            el.parentOfType(
+                JSVarStatement::class,
+                JSExpressionStatement::class,
+                JSAssignmentExpression::class,
+                JSIfStatement::class
+            )
+        }
         checkNotNull(expression)
 
         val variable =
@@ -76,6 +78,9 @@ class LogItAdd : AnAction("Insert log") {
         return Pair(caret.offset, variable)
     }
 
+    /**
+     * when the cursor is on a loggable identifier
+     */
     private fun findIdentifierForElement(element: PsiElement): PsiElement? {
         val elementType = element.node.elementType.toString()
         when {
@@ -85,9 +90,12 @@ class LogItAdd : AnAction("Insert log") {
             -> return findIdentifierForElement(element.parent)
         }
 
-        return element
+        return null
     }
 
+    /**
+     * find the identifier to log when the cursor is not on a loggable identifier
+     */
     private fun findIdentifierForExpression(expression: PsiElement): PsiElement {
 
         val elementType = expression.node.elementType.toString()
