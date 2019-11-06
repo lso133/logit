@@ -15,18 +15,19 @@
 
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
+        <applicationConfigurable groupId="other" instance="logit.LogItConfigurable" id="logit"
+                                 displayName="Log It"/>
     </extensions>
 
     <actions>
-        <group id="org.lso.LogIt.LogItActionsGroup" class="LogItActionsGroup" text="Log It"
+        <group id="org.lso.logit.LogItActionsGroup" class="logit.LogItActionsGroup" text="Log It"
                description="Generate javascript logs" popup="true">
             <add-to-group group-id="CodeMenu" anchor="last"/>
-            <action id="org.lso.LogIt.addLog" class="LogItAdd" text="Generate Console.Log"
+            <action id="org.lso.logit.addLog" class="logit.LogItAdd" text="Generate Console.Log"
                     description="Generate a console.log() for that variable">
                 <keyboard-shortcut keymap="$default" first-keystroke="meta L"/>
             </action>
-            <action id="org.lso.LogIt.deleteLogs" class="LogItDelete" text="Generate Console.Log"
+            <action id="org.lso.logit.deleteLogs" class="logit.LogItDelete" text="Generate Console.Log"
                     description="Generate a console.log() for that variable">
                 <keyboard-shortcut keymap="$default" first-keystroke="meta U"/>
             </action>

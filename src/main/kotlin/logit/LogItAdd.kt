@@ -1,3 +1,5 @@
+package logit
+
 import com.intellij.ide.DataManager
 import com.intellij.lang.javascript.JavascriptLanguage
 import com.intellij.lang.javascript.psi.*
@@ -8,7 +10,6 @@ import com.intellij.openapi.editor.actionSystem.EditorAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.util.parentOfType
-
 
 class LogItAdd : AnAction("Insert log") {
     override fun actionPerformed(e: AnActionEvent) {
