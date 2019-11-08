@@ -1,45 +1,57 @@
 package logit
 
-import com.intellij.ide.DataManager
 import com.intellij.lang.javascript.JavascriptLanguage
 import com.intellij.lang.javascript.psi.*
-import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.actionSystem.EditorAction
+import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.util.parentOfType
 
+
 class LogItAdd : AnAction("Insert log") {
     override fun actionPerformed(e: AnActionEvent) {
-        e.getData(PlatformDataKeys.EDITOR)?.let { editor ->
+        // Editor is known to exist from update, so it's not null
+        val editor = e.getRequiredData(CommonDataKeys.EDITOR)
+        val actionManager = EditorActionManager.getInstance()
+        val startNewLineHandler = actionManager.getActionHandler(IdeActions.ACTION_EDITOR_START_NEW_LINE)
 
-            // parse the file as a simple JavaScript file
-            val psiFile =
-                PsiFileFactory.getInstance(e.project).createFileFromText(
-                    "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
-                )
+        // parse the file as a simple JavaScript file
+        val psiFile =
+            PsiFileFactory.getInstance(e.project).createFileFromText(
+                "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
+            )
 
-            val offset = editor.caretModel.currentCaret.offset
+        val offset = editor.caretModel.currentCaret.offset
 
-            psiFile.findElementAt(offset)?.let { element ->
-                val el = findIdentifierForElement(element)
-                val (newOffset, variableName) = insertTheNewLine(editor, element, el?.text)
+        psiFile.findElementAt(offset)?.let { element ->
 
-                WriteCommandAction.runWriteCommandAction(e.project) {
-                    val line = "console.log(\"$variableName\");"
-                    editor.document.insertString(newOffset, line)
-                }
+            val el = findIdentifierForElement(element)
+            val variableName = moveCursorToInsertionPoint(editor, element, el?.text)
+            val lineToInsert = "console.log(\"${Settings.logItPrefix}\", $variableName);"
+
+            val runnable = {
+                startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
+                editor.document.insertString(editor.caretModel.currentCaret.offset, lineToInsert)
             }
+            WriteCommandAction.runWriteCommandAction(editor.project, runnable)
         }
     }
 
-    private fun insertTheNewLine(
+    /**
+     * search for the cursor insertion point
+     * return the name of the element to log
+     */
+    private fun moveCursorToInsertionPoint(
         editor: Editor,
         element: PsiElement,
         identifier: String?
-    ): Pair<Int, String?> {
+    ): String? {
         val expression = let {
 
             val el = if (element.node.elementType.toString() == "WHITE_SPACE") element.prevSibling else element
@@ -53,30 +65,20 @@ class LogItAdd : AnAction("Insert log") {
         }
         checkNotNull(expression)
 
-        val variable =
-            when {
-                expression.text.trim().isEmpty() -> "rien"
-                expression is JSIfStatement -> {
-                    // for "if" statements insert line above
-                    editor.caretModel.moveToOffset(expression.prevSibling.textRange.startOffset - 1)
-                    element.parentOfType(JSReferenceExpression::class)?.let {
-                        identifier ?: findIdentifierForExpression(it).text
-                    }
-                }
-                else -> {
-                    editor.caretModel.moveToOffset(expression.textRange.endOffset)
-                    identifier ?: findIdentifierForExpression(expression).text
+        return when {
+            expression.text.trim().isEmpty() -> "empty"
+            expression is JSIfStatement -> {
+                // for "if" statements insert line above
+                editor.caretModel.moveToOffset(expression.prevSibling.textRange.startOffset - 1)
+                element.parentOfType(JSReferenceExpression::class)?.let {
+                    identifier ?: findIdentifierForExpression(it).text
                 }
             }
-
-        val dataContext = DataManager.getInstance().getDataContext(editor.component)
-
-        val action = ActionManager.getInstance()
-            .getAction(IdeActions.ACTION_EDITOR_START_NEW_LINE) as EditorAction
-        action.actionPerformed(editor, dataContext)
-
-        val caret = editor.caretModel.currentCaret
-        return Pair(caret.offset, variable)
+            else -> {
+                editor.caretModel.moveToOffset(expression.textRange.endOffset)
+                identifier ?: findIdentifierForExpression(expression).text
+            }
+        }
     }
 
     /**
