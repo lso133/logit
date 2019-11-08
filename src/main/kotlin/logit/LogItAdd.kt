@@ -32,16 +32,36 @@ class LogItAdd : AnAction("Insert log") {
         psiFile.findElementAt(offset)?.let { element ->
 
             val el = findIdentifierForElement(element)
-            val variableName = moveCursorToInsertionPoint(editor, element, el?.text)
-            val lineToInsert = "console.log(\"${Settings.logItPrefix}\", $variableName);"
+
+            val psiElem = if (el == null) psiFile.findElementAt(offset - 1) else element
+
+            checkNotNull(psiElem)
+
+            val insertionInfo = moveCursorToInsertionPoint(editor, psiElem, el?.text)
+            val lineToInsert =
+                "console.log(\"${Settings.logItPrefix} ${insertionInfo.variableName}\", ${insertionInfo.variableName});"
 
             val runnable = {
                 startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
-                editor.document.insertString(editor.caretModel.currentCaret.offset, lineToInsert)
+                val newOffset = editor.caretModel.currentCaret.offset
+
+                editor.document.insertString(newOffset, lineToInsert)
+
+                // position the caret after the insertion was done
+                editor.caretModel.moveToOffset(
+                    when {
+                        insertionInfo.variableName.isEmpty() -> newOffset + lineToInsert.length - 2
+                        insertionInfo.position == Position.BEFORE -> offset
+                        else -> newOffset + lineToInsert.length
+                    }
+                )
             }
             WriteCommandAction.runWriteCommandAction(editor.project, runnable)
         }
     }
+
+    private enum class Position { BEFORE, AFTER }
+    private data class InsertionInfo(val variableName: String, val position: Position)
 
     /**
      * search for the cursor insertion point
@@ -51,32 +71,31 @@ class LogItAdd : AnAction("Insert log") {
         editor: Editor,
         element: PsiElement,
         identifier: String?
-    ): String? {
-        val expression = let {
-
-            val el = if (element.node.elementType.toString() == "WHITE_SPACE") element.prevSibling else element
-
-            el.parentOfType(
+    ): InsertionInfo {
+        val expression =
+            element.parentOfType(
                 JSVarStatement::class,
                 JSExpressionStatement::class,
                 JSAssignmentExpression::class,
                 JSIfStatement::class
             )
-        }
+
         checkNotNull(expression)
 
-        return when {
-            expression.text.trim().isEmpty() -> "empty"
-            expression is JSIfStatement -> {
+        return when (expression) {
+            is JSIfStatement -> {
                 // for "if" statements insert line above
                 editor.caretModel.moveToOffset(expression.prevSibling.textRange.startOffset - 1)
-                element.parentOfType(JSReferenceExpression::class)?.let {
+                InsertionInfo(element.parentOfType(JSReferenceExpression::class)?.let {
                     identifier ?: findIdentifierForExpression(it).text
-                }
+                } ?: "none", Position.BEFORE)
             }
             else -> {
                 editor.caretModel.moveToOffset(expression.textRange.endOffset)
-                identifier ?: findIdentifierForExpression(expression).text
+                InsertionInfo(
+                    identifier ?: findIdentifierForExpression(expression).text,
+                    Position.AFTER
+                )
             }
         }
     }
