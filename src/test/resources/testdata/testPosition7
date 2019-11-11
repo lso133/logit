@@ -1,0 +1,25 @@
+removeNonPertinentEvents(group) {
+      if (!group.events || group.events.length === 0) {
+        return [];
+      }
+
+      let filtered = group.events.filter(
+        (evt, index) =>
+          (!group.poi &&
+            group.isCurrent &&
+            index === group.events.length - 1) ||
+          (evt.event.type !== "PERIODIC" &&
+            evt.event.type !== "MOVE_BEGIN" &&
+            evt.event.type !== "CLOSE" &&
+            evt.event.type !== "STARTUP" &&<caret>
+            !(group.poi && evt.event.type === "MOVE_END") &&
+            !// outside of a POI, if there is an event before a periodic it doesn't appear https://next4io.atlassian.net/browse/APP-6
+            (
+              !group.poi &&
+              group.isCurrent &&
+              index === group.events.length - 1
+            ))
+      );
+
+      return filtered;
+    },

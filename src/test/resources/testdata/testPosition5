@@ -1,0 +1,10 @@
+func() {
+    this.groupedEvents.push({
+        events: group.events,
+        poi: group.poi,
+        isCurrent: last<caret>One,
+        startingDate: group.startingDate,
+        endingDate: group.endingDate,
+        dashed: false
+    });
+}

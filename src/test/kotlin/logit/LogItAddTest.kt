@@ -6,8 +6,43 @@ import org.junit.Test
 class LogItAddTest : BasePlatformTestCase() {
 
     @Test
-    fun testOnVariable() {
-        val file = "/testdata/${this.name}.js"
+    fun testPosition1() {
+        doTest(this.name)
+    }
+
+    @Test
+    fun testPosition2() {
+        doTest(this.name)
+    }
+
+    @Test
+    fun testPosition3() {
+        doTest(this.name)
+    }
+
+    @Test
+    fun testPosition4() {
+        doTest(this.name)
+    }
+
+    @Test
+    fun testPosition5() {
+        doTest(this.name)
+    }
+
+    @Test
+    fun testPosition6() {
+        doTest(this.name)
+    }
+
+    @Test
+    fun testPosition7() {
+        doTest(this.name)
+    }
+
+    private fun doTest(name: String) {
+
+        val file = "/testdata/$name"
         val jsonRef = javaClass.getResource(file).file
         myFixture.testDataPath = ""
 
@@ -15,6 +50,6 @@ class LogItAddTest : BasePlatformTestCase() {
 
         myFixture.testAction(LogItAdd())
 
-        myFixture.checkResultByFile("$jsonRef.res", true)
+        myFixture.checkResultByFile("$jsonRef.result", true)
     }
 }

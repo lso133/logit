@@ -1,0 +1,6 @@
+getTranslation(index) {
+      let y = this.$store.state.timeline.elements
+        .slice(0, index)
+        .reduce((acc, value) => acc + value.height, 0);<caret>
+      return "translate(" + this.$store.state.timeline.x + " " + +y + ")";
+    }

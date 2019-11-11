@@ -1,0 +1,3 @@
+test() {
+    let variable = null;<caret>
+}

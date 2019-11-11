@@ -23,26 +23,26 @@ class LogItAdd : AnAction("Insert log") {
         val lineToInsert =
             "console.log(\"${Settings.logItPrefix} $variableName\", $variableName);"
 
-        val runnable = {
-            startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
-            val newOffset = editor.caretModel.currentCaret.offset
+        variableName?.let {
+            val runnable = {
+                startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
+                val newOffset = editor.caretModel.currentCaret.offset
 
-            editor.document.insertString(newOffset, lineToInsert)
+                editor.document.insertString(newOffset, lineToInsert)
 
-            // position the caret after the insertion was done
-            editor.caretModel.moveToOffset(
-                when {
-                    variableName != null -> newOffset + lineToInsert.length
-                    //insertionInfo.position == Position.BEFORE -> offset
-                    else -> newOffset + lineToInsert.length
-                }
-            )
+                // position the caret after the insertion was done
+                editor.caretModel.moveToOffset(
+                    if (variableName.isEmpty()) {
+                        newOffset + lineToInsert.length - 2
+                    } else {
+                        newOffset + lineToInsert.length
+                    }
+                )
+
+            }
+            WriteCommandAction.runWriteCommandAction(editor.project, runnable)
         }
-        WriteCommandAction.runWriteCommandAction(editor.project, runnable)
     }
-
-    private enum class Position { BEFORE, AFTER }
-    private data class InsertionInfo(val variableName: String, val position: Position)
 
     /**
      * search for the cursor insertion point
@@ -65,6 +65,8 @@ class LogItAdd : AnAction("Insert log") {
         val element = findElementToLogForSelection(elementAtCursor)
 
         val block = findBlockForElement(element ?: elementAtCursor)
+
+        block?.let { editor.caretModel.moveToOffset(block.textRange.endOffset) }
 
 //        val expression =
 //            identifier.parentOfType(
@@ -95,7 +97,7 @@ class LogItAdd : AnAction("Insert log") {
 ////                )
 //            }
 //        }
-        return element?.text
+        return if (block == null) null else element?.text ?: ""
     }
 
     /**
@@ -106,19 +108,26 @@ class LogItAdd : AnAction("Insert log") {
     ): PsiElement? {
 
         val elementType = element.node.elementType.toString()
+        val parentElementType = element.parent.node.elementType.toString()
         when {
-            elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION"
+            (elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION")
+                    || parentElementType == "JS:REFERENCE_EXPRESSION"
             -> {
                 val block = findBlockForElement(element)
-                return findElementToLogForBlock(block) ?: element
+                return if (element.text.trim(' ') == "\n" && element.prevSibling?.lastChild?.text == ";") null
+                else findElementToLogForBlock(
+                    block
+                )
             }
 
             element.prevSibling != null
                     && element.prevSibling.node.elementType.toString() == "JS:DOT"
             -> return findElementToLogForSelection(element.parent)
 
-            elementType == "JS:IDENTIFIER" ->
+            elementType == "JS:IDENTIFIER" && parentElementType == "JS:VARIABLE" ->
                 return findElementToLogForBlock(element)
+
+            element.prevSibling == null -> return null
         }
 
         return element
@@ -135,18 +144,14 @@ class LogItAdd : AnAction("Insert log") {
         when {
             (elementType == "JS:IDENTIFIER" && parentType != "JS:PROPERTY")
                     || elementType == "JS:DEFINITION_EXPRESSION"
-                    || elementType == "JS:VARIABLE" -> return element
+                    || (elementType == "JS:REFERENCE_EXPRESSION" && parentType == "JS:REFERENCE_EXPRESSION")
+            -> return element
+            elementType == "JS:VARIABLE" -> return element.firstChild
         }
 
         if (element.firstChild == null) {
-            val tt = findBlockForElement(element)
-            return findElementToLogForBlock(tt)
+            return findElementToLogForBlock(element.nextSibling)
         }
-
-//        element.children.forEach {
-//            val tt = findElementToLogForBlock(it)
-//            println(tt?.text)
-//        }
 
         return findElementToLogForBlock(element.firstChild)
     }
@@ -154,19 +159,19 @@ class LogItAdd : AnAction("Insert log") {
     /**
      * find the block containing this element
      */
-    private fun findBlockForElement(element: PsiElement): PsiElement {
+    private fun findBlockForElement(element: PsiElement): PsiElement? {
 
         val elementType = element.node.elementType.toString()
-        if (
-        //elementType == "JS:DEFINITION_EXPRESSION" ||
-            elementType == "JS:EXPRESSION_STATEMENT" ||
-            //elementType == "JS:THIS_EXPRESSION" ||
-            elementType == "JS:VAR_STATEMENT"
-//            (elementType == "JS:REFERENCE_EXPRESSION"
-//                    && element.parent.node.elementType.toString() == "JS:REFERENCE_EXPRESSION") ||
-//            (elementType == "JS:REFERENCE_EXPRESSION"
-//                    && element.parent.node.elementType.toString() == "JS:BINARY_EXPRESSION")
-        ) return element
+        val parentElementType = if (element.parent == null) {
+            return null
+        } else element.parent.node.elementType.toString()
+
+        when {
+            (elementType == "JS:EXPRESSION_STATEMENT" && parentElementType != "FILE")
+                    || elementType == "JS:VAR_STATEMENT" -> return element
+
+            element.text.trim(' ') == "\n" -> return findBlockForElement(element.prevSibling)
+        }
 
         return findBlockForElement(element.parent)
     }

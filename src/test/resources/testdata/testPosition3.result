@@ -1,0 +1,4 @@
+test() {
+    let variable = null;
+    console.log("-> ", <caret>);
+}
