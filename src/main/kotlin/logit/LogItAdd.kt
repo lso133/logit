@@ -114,7 +114,10 @@ class LogItAdd : AnAction("Insert log") {
                     || parentElementType == "JS:REFERENCE_EXPRESSION"
             -> {
                 val block = findBlockForElement(element)
-                return if (element.text.trim(' ') == "\n" && element.prevSibling?.lastChild?.text == ";") null
+                return if (element.text.trim(' ') == "\n"
+                    && (element.prevSibling?.lastChild?.text == ";"
+                            || block?.text?.trim() == "{")
+                ) null
                 else findElementToLogForBlock(
                     block
                 )
@@ -170,6 +173,7 @@ class LogItAdd : AnAction("Insert log") {
             (elementType == "JS:EXPRESSION_STATEMENT" && parentElementType != "FILE")
                     || elementType == "JS:VAR_STATEMENT" -> return element
 
+            element.text.trim(' ') == "{" -> return element
             element.text.trim(' ') == "\n" -> return findBlockForElement(element.prevSibling)
         }
 

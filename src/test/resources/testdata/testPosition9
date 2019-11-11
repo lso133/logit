@@ -1,0 +1,3 @@
+ if (evt && evt.event) {<caret>
+        return evt.event.timestamp;
+      }
