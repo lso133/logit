@@ -1,6 +1,7 @@
 package logit
 
 import com.intellij.lang.javascript.JavascriptLanguage
+import com.intellij.lang.javascript.psi.JSIfStatement
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -66,7 +67,13 @@ class LogItAdd : AnAction("Insert log") {
 
         val block = findBlockForElement(element ?: elementAtCursor)
 
-        block?.let { editor.caretModel.moveToOffset(block.textRange.endOffset) }
+        when {
+            block is JSIfStatement -> {
+                // for "if" statements insert line above
+                editor.caretModel.moveToOffset(block.prevSibling.textRange.startOffset - 1)
+            }
+            block != null -> editor.caretModel.moveToOffset(block.textRange.endOffset)
+        }
 
 //        val expression =
 //            identifier.parentOfType(
@@ -110,22 +117,25 @@ class LogItAdd : AnAction("Insert log") {
         val elementType = element.node.elementType.toString()
         val parentElementType = element.parent.node.elementType.toString()
         when {
+            element.prevSibling != null
+                    && element.prevSibling.node.elementType.toString() == "JS:DOT"
+            -> return findElementToLogForSelection(element.parent)
+
             (elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION")
                     || parentElementType == "JS:REFERENCE_EXPRESSION"
             -> {
                 val block = findBlockForElement(element)
-                return if (element.text.trim(' ') == "\n"
-                    && (element.prevSibling?.lastChild?.text == ";"
-                            || block?.text?.trim() == "{")
-                ) null
-                else findElementToLogForBlock(
-                    block
-                )
+                return when {
+                    element.text.trim(' ') == "\n" && (element.prevSibling?.lastChild?.text == ";") -> null
+                    block?.text?.trim() == "{" -> null
+                    block?.node?.elementType.toString() == "JS:IF_STATEMENT" -> element.prevSibling?.let {
+                        findElementToLogForSelection(
+                            element.prevSibling
+                        )
+                    } ?: element
+                    else -> findElementToLogForBlock(block)
+                }
             }
-
-            element.prevSibling != null
-                    && element.prevSibling.node.elementType.toString() == "JS:DOT"
-            -> return findElementToLogForSelection(element.parent)
 
             elementType == "JS:IDENTIFIER" && parentElementType == "JS:VARIABLE" ->
                 return findElementToLogForBlock(element)
@@ -170,8 +180,9 @@ class LogItAdd : AnAction("Insert log") {
         } else element.parent.node.elementType.toString()
 
         when {
-            (elementType == "JS:EXPRESSION_STATEMENT" && parentElementType != "FILE")
-                    || elementType == "JS:VAR_STATEMENT" -> return element
+            (elementType == "JS:EXPRESSION_STATEMENT" && parentElementType != "FILE") -> return element
+            elementType == "JS:VAR_STATEMENT" -> return element
+            elementType == "JS:IF_STATEMENT" -> return element
 
             element.text.trim(' ') == "{" -> return element
             element.text.trim(' ') == "\n" -> return findBlockForElement(element.prevSibling)
