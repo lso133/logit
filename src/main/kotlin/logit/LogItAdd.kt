@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.psi.PsiElement
@@ -18,27 +19,26 @@ class LogItAdd : AnAction("Insert log") {
         val actionManager = EditorActionManager.getInstance()
         val startNewLineHandler = actionManager.getActionHandler(IdeActions.ACTION_EDITOR_START_NEW_LINE)
 
-        val insertionInfo = moveCursorToInsertionPoint(editor)
-//        val lineToInsert =
-//            "console.log(\"${Settings.logItPrefix} ${insertionInfo.variableName}\", ${insertionInfo.variableName});"
-//
-//        val runnable = {
-//            startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
-//            val newOffset = editor.caretModel.currentCaret.offset
-//
-//            editor.document.insertString(newOffset, lineToInsert)
-//
-//            // position the caret after the insertion was done
-//            editor.caretModel.moveToOffset(
-//                when {
-//                    insertionInfo.variableName.isEmpty() -> newOffset + lineToInsert.length - 2
-//                    //insertionInfo.position == Position.BEFORE -> offset
-//                    else -> newOffset + lineToInsert.length
-//                }
-//            )
-//        }
-//        WriteCommandAction.runWriteCommandAction(editor.project, runnable)
+        val variableName = moveCursorToInsertionPoint(editor)
+        val lineToInsert =
+            "console.log(\"${Settings.logItPrefix} $variableName\", $variableName);"
 
+        val runnable = {
+            startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
+            val newOffset = editor.caretModel.currentCaret.offset
+
+            editor.document.insertString(newOffset, lineToInsert)
+
+            // position the caret after the insertion was done
+            editor.caretModel.moveToOffset(
+                when {
+                    variableName != null -> newOffset + lineToInsert.length
+                    //insertionInfo.position == Position.BEFORE -> offset
+                    else -> newOffset + lineToInsert.length
+                }
+            )
+        }
+        WriteCommandAction.runWriteCommandAction(editor.project, runnable)
     }
 
     private enum class Position { BEFORE, AFTER }
@@ -50,7 +50,7 @@ class LogItAdd : AnAction("Insert log") {
      */
     private fun moveCursorToInsertionPoint(
         editor: Editor
-    ): InsertionInfo {
+    ): String? {
         // parse the file as a simple JavaScript file
         val psiFile =
             PsiFileFactory.getInstance(editor.project).createFileFromText(
@@ -63,8 +63,6 @@ class LogItAdd : AnAction("Insert log") {
         checkNotNull(elementAtCursor)
 
         val element = findElementToLogForSelection(elementAtCursor)
-
-        println(element?.text)
 
         val block = findBlockForElement(element ?: elementAtCursor)
 
@@ -97,7 +95,7 @@ class LogItAdd : AnAction("Insert log") {
 ////                )
 //            }
 //        }
-        return InsertionInfo("", Position.AFTER)
+        return element?.text
     }
 
     /**
