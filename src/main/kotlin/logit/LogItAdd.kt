@@ -1,17 +1,14 @@
 package logit
 
 import com.intellij.lang.javascript.JavascriptLanguage
-import com.intellij.lang.javascript.psi.*
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
-import com.intellij.psi.util.parentOfType
 
 
 class LogItAdd : AnAction("Insert log") {
@@ -21,43 +18,27 @@ class LogItAdd : AnAction("Insert log") {
         val actionManager = EditorActionManager.getInstance()
         val startNewLineHandler = actionManager.getActionHandler(IdeActions.ACTION_EDITOR_START_NEW_LINE)
 
-        // parse the file as a simple JavaScript file
-        val psiFile =
-            PsiFileFactory.getInstance(e.project).createFileFromText(
-                "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
-            )
+        val insertionInfo = moveCursorToInsertionPoint(editor)
+//        val lineToInsert =
+//            "console.log(\"${Settings.logItPrefix} ${insertionInfo.variableName}\", ${insertionInfo.variableName});"
+//
+//        val runnable = {
+//            startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
+//            val newOffset = editor.caretModel.currentCaret.offset
+//
+//            editor.document.insertString(newOffset, lineToInsert)
+//
+//            // position the caret after the insertion was done
+//            editor.caretModel.moveToOffset(
+//                when {
+//                    insertionInfo.variableName.isEmpty() -> newOffset + lineToInsert.length - 2
+//                    //insertionInfo.position == Position.BEFORE -> offset
+//                    else -> newOffset + lineToInsert.length
+//                }
+//            )
+//        }
+//        WriteCommandAction.runWriteCommandAction(editor.project, runnable)
 
-        val offset = editor.caretModel.currentCaret.offset
-
-        psiFile.findElementAt(offset)?.let { element ->
-
-            val el = findIdentifierForElement(element)
-
-            val psiElem = if (el == null) psiFile.findElementAt(offset - 1) else element
-
-            checkNotNull(psiElem)
-
-            val insertionInfo = moveCursorToInsertionPoint(editor, psiElem, el?.text)
-            val lineToInsert =
-                "console.log(\"${Settings.logItPrefix} ${insertionInfo.variableName}\", ${insertionInfo.variableName});"
-
-            val runnable = {
-                startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
-                val newOffset = editor.caretModel.currentCaret.offset
-
-                editor.document.insertString(newOffset, lineToInsert)
-
-                // position the caret after the insertion was done
-                editor.caretModel.moveToOffset(
-                    when {
-                        insertionInfo.variableName.isEmpty() -> newOffset + lineToInsert.length - 2
-                        insertionInfo.position == Position.BEFORE -> offset
-                        else -> newOffset + lineToInsert.length
-                    }
-                )
-            }
-            WriteCommandAction.runWriteCommandAction(editor.project, runnable)
-        }
     }
 
     private enum class Position { BEFORE, AFTER }
@@ -68,73 +49,128 @@ class LogItAdd : AnAction("Insert log") {
      * return the name of the element to log
      */
     private fun moveCursorToInsertionPoint(
-        editor: Editor,
-        element: PsiElement,
-        identifier: String?
+        editor: Editor
     ): InsertionInfo {
-        val expression =
-            element.parentOfType(
-                JSVarStatement::class,
-                JSExpressionStatement::class,
-                JSAssignmentExpression::class,
-                JSIfStatement::class
+        // parse the file as a simple JavaScript file
+        val psiFile =
+            PsiFileFactory.getInstance(editor.project).createFileFromText(
+                "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
             )
+        val offset = editor.caretModel.currentCaret.offset
 
-        checkNotNull(expression)
+        val elementAtCursor = psiFile.findElementAt(offset)
 
-        return when (expression) {
-            is JSIfStatement -> {
-                // for "if" statements insert line above
-                editor.caretModel.moveToOffset(expression.prevSibling.textRange.startOffset - 1)
-                InsertionInfo(element.parentOfType(JSReferenceExpression::class)?.let {
-                    identifier ?: findIdentifierForExpression(it).text
-                } ?: "none", Position.BEFORE)
-            }
-            else -> {
-                editor.caretModel.moveToOffset(expression.textRange.endOffset)
-                InsertionInfo(
-                    identifier ?: findIdentifierForExpression(expression).text,
-                    Position.AFTER
-                )
-            }
-        }
+        checkNotNull(elementAtCursor)
+
+        val element = findElementToLogForSelection(elementAtCursor)
+
+        println(element?.text)
+
+        val block = findBlockForElement(element ?: elementAtCursor)
+
+//        val expression =
+//            identifier.parentOfType(
+//                JSVarStatement::class,
+//                JSExpressionStatement::class,
+//                JSAssignmentExpression::class,
+//                JSIfStatement::class
+//            )
+//
+//        checkNotNull(expression)
+//
+//        return when (expression) {
+//            is JSIfStatement -> {
+//                // for "if" statements insert line above
+//                editor.caretModel.moveToOffset(expression.prevSibling.textRange.startOffset - 1)
+////                InsertionInfo(identifier.parentOfType(JSReferenceExpression::class)?.let {
+////                    identifier ?: findIdentifierForExpression(it).text
+////                } ?: "none", Position.BEFORE)
+//                InsertionInfo("if", Position.BEFORE)
+//            }
+//            else -> {
+//                editor.caretModel.moveToOffset(expression.textRange.endOffset)
+//                InsertionInfo("pas if", Position.AFTER)
+//
+////                InsertionInfo(
+////                    identifier ?: findIdentifierForExpression(expression).text,
+////                    Position.AFTER
+////                )
+//            }
+//        }
+        return InsertionInfo("", Position.AFTER)
     }
 
     /**
      * when the cursor is on a loggable identifier
      */
-    private fun findIdentifierForElement(element: PsiElement): PsiElement? {
+    private fun findElementToLogForSelection(
+        element: PsiElement
+    ): PsiElement? {
+
         val elementType = element.node.elementType.toString()
         when {
-            elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION" -> return null
+            elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION"
+            -> {
+                val block = findBlockForElement(element)
+                return findElementToLogForBlock(block) ?: element
+            }
+
             element.prevSibling != null
                     && element.prevSibling.node.elementType.toString() == "JS:DOT"
-            -> return findIdentifierForElement(element.parent)
+            -> return findElementToLogForSelection(element.parent)
+
+            elementType == "JS:IDENTIFIER" ->
+                return findElementToLogForBlock(element)
         }
 
-        return null
+        return element
     }
 
     /**
-     * find the identifier to log when the cursor is not on a loggable identifier
+     * find the element to log inside a given block
      */
-    private fun findIdentifierForExpression(expression: PsiElement): PsiElement {
+    private fun findElementToLogForBlock(element: PsiElement?): PsiElement? {
+        element ?: return null
+        val elementType = element.node.elementType.toString()
+        val parentType = element.parent.node.elementType.toString()
 
-        val elementType = expression.node.elementType.toString()
-        if (elementType == "JS:DEFINITION_EXPRESSION" ||
-            elementType == "JS:IDENTIFIER" ||
-            elementType == "JS:THIS_EXPRESSION" ||
-            (elementType == "JS:REFERENCE_EXPRESSION"
-                    && expression.parent.node.elementType.toString() == "JS:REFERENCE_EXPRESSION") ||
-            (elementType == "JS:REFERENCE_EXPRESSION"
-                    && expression.parent.node.elementType.toString() == "JS:BINARY_EXPRESSION")
-        ) return expression
+        when {
+            (elementType == "JS:IDENTIFIER" && parentType != "JS:PROPERTY")
+                    || elementType == "JS:DEFINITION_EXPRESSION"
+                    || elementType == "JS:VARIABLE" -> return element
+        }
 
-        var child = expression.firstChild
+        if (element.firstChild == null) {
+            val tt = findBlockForElement(element)
+            return findElementToLogForBlock(tt)
+        }
 
-        if (child == null) child = findIdentifierForExpression(expression.nextSibling)
+//        element.children.forEach {
+//            val tt = findElementToLogForBlock(it)
+//            println(tt?.text)
+//        }
 
-        return findIdentifierForExpression(child)
+        return findElementToLogForBlock(element.firstChild)
+    }
+
+    /**
+     * find the block containing this element
+     */
+    private fun findBlockForElement(element: PsiElement): PsiElement {
+
+        val elementType = element.node.elementType.toString()
+        if (
+        //elementType == "JS:DEFINITION_EXPRESSION" ||
+            elementType == "JS:EXPRESSION_STATEMENT" ||
+            //elementType == "JS:THIS_EXPRESSION" ||
+            elementType == "JS:VAR_STATEMENT"
+//            (elementType == "JS:REFERENCE_EXPRESSION"
+//                    && element.parent.node.elementType.toString() == "JS:REFERENCE_EXPRESSION") ||
+//            (elementType == "JS:REFERENCE_EXPRESSION"
+//                    && element.parent.node.elementType.toString() == "JS:BINARY_EXPRESSION")
+        ) return element
+
+        return findBlockForElement(element.parent)
     }
 }
 
