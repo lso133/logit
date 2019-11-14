@@ -58,15 +58,27 @@ class LogItAdd : AnAction("Insert log") {
             PsiFileFactory.getInstance(editor.project).createFileFromText(
                 "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
             )
-        val offset = editor.caretModel.currentCaret.offset
 
-        val elementAtCursor = psiFile.findElementAt(offset)
+        val valueToLog: String?
+        val element: PsiElement?
 
-        checkNotNull(elementAtCursor)
+        if (editor.selectionModel.hasSelection()) {
+            valueToLog = editor.selectionModel.selectedText
 
-        val element = findElementToLogForSelection(elementAtCursor)
+            val offset = editor.selectionModel.selectionStart
 
-        val block = findBlockForElement(element ?: elementAtCursor)
+            element = psiFile.findElementAt(offset)
+        } else {
+            val offset = editor.caretModel.currentCaret.offset
+
+            val elementAtCursor = psiFile.findElementAt(offset)
+
+            element = findElementToLogForSelection(elementAtCursor!!) ?: elementAtCursor
+
+            valueToLog = element.text
+        }
+
+        val block = findBlockForElement(element!!)
 
         when {
             block is JSIfStatement -> {
@@ -76,7 +88,7 @@ class LogItAdd : AnAction("Insert log") {
             block != null -> editor.caretModel.moveToOffset(block.textRange.endOffset)
         }
 
-        return if (block == null) null else element?.text?.trim() ?: ""
+        return if (block == null) null else valueToLog?.trim() ?: ""
     }
 
     /**

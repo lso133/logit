@@ -1,0 +1,10 @@
+func() {
+    this.groupedEvents.push({
+        events: group.events,
+        poi: <selection>group.poi</selection>,
+        isCurrent: lastOne,
+        startingDate: group.startingDate,
+        endingDate: group.endingDate,
+        dashed: false
+    });
+}
