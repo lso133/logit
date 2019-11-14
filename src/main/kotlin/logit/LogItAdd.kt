@@ -11,6 +11,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
+import com.intellij.psi.util.parentOfType
 
 
 class LogItAdd : AnAction("Insert log") {
@@ -75,36 +76,7 @@ class LogItAdd : AnAction("Insert log") {
             block != null -> editor.caretModel.moveToOffset(block.textRange.endOffset)
         }
 
-//        val expression =
-//            identifier.parentOfType(
-//                JSVarStatement::class,
-//                JSExpressionStatement::class,
-//                JSAssignmentExpression::class,
-//                JSIfStatement::class
-//            )
-//
-//        checkNotNull(expression)
-//
-//        return when (expression) {
-//            is JSIfStatement -> {
-//                // for "if" statements insert line above
-//                editor.caretModel.moveToOffset(expression.prevSibling.textRange.startOffset - 1)
-////                InsertionInfo(identifier.parentOfType(JSReferenceExpression::class)?.let {
-////                    identifier ?: findIdentifierForExpression(it).text
-////                } ?: "none", Position.BEFORE)
-//                InsertionInfo("if", Position.BEFORE)
-//            }
-//            else -> {
-//                editor.caretModel.moveToOffset(expression.textRange.endOffset)
-//                InsertionInfo("pas if", Position.AFTER)
-//
-////                InsertionInfo(
-////                    identifier ?: findIdentifierForExpression(expression).text,
-////                    Position.AFTER
-////                )
-//            }
-//        }
-        return if (block == null) null else element?.text ?: ""
+        return if (block == null) null else element?.text?.trim() ?: ""
     }
 
     /**
@@ -121,7 +93,8 @@ class LogItAdd : AnAction("Insert log") {
                     && element.prevSibling.node.elementType.toString() == "JS:DOT"
             -> return findElementToLogForSelection(element.parent)
 
-            (elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION")
+            (elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION"
+                    && element.parentOfType(JSIfStatement::class) == null)
                     || parentElementType == "JS:REFERENCE_EXPRESSION"
             -> {
                 val block = findBlockForElement(element)
@@ -137,8 +110,13 @@ class LogItAdd : AnAction("Insert log") {
                 }
             }
 
-            elementType == "JS:IDENTIFIER" && parentElementType == "JS:VARIABLE" ->
-                return findElementToLogForBlock(element)
+            elementType == "JS:IDENTIFIER" && parentElementType == "JS:VARIABLE" -> return findElementToLogForBlock(
+                element
+            )
+            elementType == "JS:REFERENCE_EXPRESSION" -> {
+                if (element.parentOfType(JSIfStatement::class) != null) return element
+                return findElementToLogForSelection(element.parent)
+            }
 
             element.prevSibling == null -> return null
         }

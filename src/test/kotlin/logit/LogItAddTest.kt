@@ -55,6 +55,17 @@ class LogItAddTest : BasePlatformTestCase() {
         doTest(this.name)
     }
 
+    @Test
+    fun testPosition11() {
+        doTest(this.name)
+    }
+
+    @Test
+    fun testPosition12() {
+        doTest(this.name)
+    }
+
+
     private fun doTest(name: String) {
 
         val file = "/testdata/$name"

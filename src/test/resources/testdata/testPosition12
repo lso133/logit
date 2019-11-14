@@ -1,0 +1,6 @@
+  // if the previous group is a poi, insert an empty group to be the link
+  if (
+    groupedEvt.length >= 1 &&
+    groupedEvt[groupedEvt.length - 1].po<caret>i &&
+    group.poi
+  ) {
