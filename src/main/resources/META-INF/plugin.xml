@@ -2,9 +2,10 @@
     <id>org.lso.logit</id>
     <name>LogItAdd</name>
     <vendor email="laurent.soulet@gmail.com" url="https://github.com/lso133/logit">Laurent SOULET</vendor>
+    <idea-version since-build="192"/>
 
     <description><![CDATA[
-    A Webstorm plugin to quickly insert console.log
+    A Webstorm plugin to quickly insert javascript console.log
     ]]></description>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -12,7 +13,6 @@
     <!-- uncomment to enable plugin in all products-->
     <depends>com.intellij.modules.platform</depends>
     <depends>JavaScript</depends>
-
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable groupId="other" instance="logit.LogItConfigurable" id="logit"
@@ -25,7 +25,8 @@
             <add-to-group group-id="CodeMenu" anchor="last"/>
             <action id="org.lso.logit.addLog" class="logit.LogItAdd" text="Generate Console.Log"
                     description="Generate a console.log() for that variable">
-                <keyboard-shortcut keymap="$default" first-keystroke="meta L"/>
+                <keyboard-shortcut keymap="$default" first-keystroke="control L"/>
+                <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta L"/>
             </action>
             <action id="org.lso.logit.deleteLogs" class="logit.LogItDelete" text="Generate Console.Log"
                     description="Generate a console.log() for that variable">
