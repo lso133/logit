@@ -1,8 +1,7 @@
 func() {
     this.groupedEvents.push({
         events: group.events,
-        console.log("-> ", );
-        poi: group.poi,
+        poi: <selection>group.poi</selection>,
         isCurrent: lastOne,
         startingDate: group.startingDate,
         endingDate: group.endingDate,

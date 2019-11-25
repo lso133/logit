@@ -22,19 +22,24 @@ class LogItAdd : AnAction("Insert log") {
         val startNewLineHandler = actionManager.getActionHandler(IdeActions.ACTION_EDITOR_START_NEW_LINE)
 
         val variableName = moveCursorToInsertionPoint(editor)
+        val logVar = variableName?.trim()
+
         val lineToInsert =
-            "console.log(\"${Settings.logItPrefix} $variableName\", $variableName);"
+            "console.log(\"${Settings.logItPrefix} $logVar\", $logVar);"
 
         variableName?.let {
             val runnable = {
-                startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
+                if (variableName != "") {
+                    startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
+                }
+
                 val newOffset = editor.caretModel.currentCaret.offset
 
                 editor.document.insertString(newOffset, lineToInsert)
 
                 // position the caret after the insertion was done
                 editor.caretModel.moveToOffset(
-                    if (variableName.isEmpty()) {
+                    if (logVar?.isEmpty() == true) {
                         newOffset + lineToInsert.length - 2
                     } else {
                         newOffset + lineToInsert.length
@@ -75,7 +80,11 @@ class LogItAdd : AnAction("Insert log") {
 
             element = findElementToLogForSelection(elementAtCursor!!) ?: elementAtCursor
 
-            valueToLog = element.text
+            valueToLog = element.text.replace(" ", "")
+        }
+
+        if (valueToLog?.startsWith("\n\n") == true) {
+            return ""
         }
 
         val block = findBlockForElement(element!!)
@@ -88,7 +97,7 @@ class LogItAdd : AnAction("Insert log") {
             block != null -> editor.caretModel.moveToOffset(block.textRange.endOffset)
         }
 
-        return if (block == null) null else valueToLog?.trim() ?: ""
+        return if (block == null) null else valueToLog ?: ""
     }
 
     /**
@@ -101,6 +110,7 @@ class LogItAdd : AnAction("Insert log") {
         val elementType = element.node.elementType.toString()
         val parentElementType = element.parent.node.elementType.toString()
         when {
+            elementType == "WHITE_SPACE" && element.text.replace(" ", "").startsWith("\n\n") -> return null
             element.prevSibling != null
                     && element.prevSibling.node.elementType.toString() == "JS:DOT"
             -> return findElementToLogForSelection(element.parent)

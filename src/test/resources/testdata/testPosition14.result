@@ -1,11 +1,11 @@
 func() {
     this.groupedEvents.push({
         events: group.events,
-        console.log("-> ", );
         poi: group.poi,
         isCurrent: lastOne,
         startingDate: group.startingDate,
         endingDate: group.endingDate,
         dashed: false
     });
+    console.log("-> group.poi", group.poi);<caret>
 }

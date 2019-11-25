@@ -65,9 +65,14 @@ class LogItAddTest : BasePlatformTestCase() {
         doTest(this.name)
     }
 
-    // selection
     @Test
     fun testPosition13() {
+        doTest(this.name)
+    }
+
+    // selection
+    @Test
+    fun testPosition14() {
         doTest(this.name)
     }
 

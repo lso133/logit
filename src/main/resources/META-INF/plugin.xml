@@ -5,14 +5,23 @@
     <idea-version since-build="192"/>
 
     <description><![CDATA[
-    A Webstorm plugin to quickly insert javascript console.log
-    ]]></description>
+        <h2>LogIt</h2>
+        <p>A Webstorm/Intellij plugin to quickly insert Javascript console.log</p>
+        <h3>Features:</h3>
+        <ul>
+            <li><b>Insert log</b> - add GitLab autocompleter to IDE Git checkout dialog</li>
+            <li><b>GitLab Share dialog</b> - allows quick import of new projects to GitLab, user can specify namespace and project visibility</li>
+            <li><b>GitLab Merge Request dialog</b> - user can quickly create new merge requests from current branch</li>
+            <li><b>GitLab Merge Request List dialog</b> - user can list and accept all open code reviews</li>
+        </ul>]]>
+    </description>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
-    <!-- uncomment to enable plugin in all products-->
     <depends>com.intellij.modules.platform</depends>
     <depends>JavaScript</depends>
+
+    <change-notes>Initial release of the plugin.</change-notes>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable groupId="other" instance="logit.LogItConfigurable" id="logit"
@@ -25,13 +34,13 @@
             <add-to-group group-id="CodeMenu" anchor="last"/>
             <action id="org.lso.logit.addLog" class="logit.LogItAdd" text="Generate Console.Log"
                     description="Generate a console.log() for that variable">
-                <keyboard-shortcut keymap="$default" first-keystroke="control L"/>
+                <keyboard-shortcut keymap="$default" first-keystroke="alt L"/>
                 <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta L"/>
             </action>
-            <action id="org.lso.logit.deleteLogs" class="logit.LogItDelete" text="Generate Console.Log"
-                    description="Generate a console.log() for that variable">
-                <keyboard-shortcut keymap="$default" first-keystroke="meta U"/>
-            </action>
+            <!--            <action id="org.lso.logit.deleteLogs" class="logit.LogItDelete" text="Generate Console.Log"-->
+            <!--                    description="Generate a console.log() for that variable">-->
+            <!--                <keyboard-shortcut keymap="$default" first-keystroke="meta U"/>-->
+            <!--            </action>-->
         </group>
     </actions>
 </idea-plugin>
