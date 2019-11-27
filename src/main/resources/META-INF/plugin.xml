@@ -2,7 +2,6 @@
     <id>org.lso.logit</id>
     <name>LogItAdd</name>
     <vendor email="laurent.soulet@gmail.com" url="https://github.com/lso133/logit">Laurent SOULET</vendor>
-    <idea-version since-build="192"/>
 
     <description><![CDATA[
         <h2>LogIt</h2>
@@ -22,11 +21,6 @@
     <depends>JavaScript</depends>
 
     <change-notes>Initial release of the plugin.</change-notes>
-
-    <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable groupId="other" instance="logit.LogItConfigurable" id="logit"
-                                 displayName="Log It"/>
-    </extensions>
 
     <actions>
         <group id="org.lso.logit.LogItActionsGroup" class="logit.LogItActionsGroup" text="Log It"

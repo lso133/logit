@@ -25,7 +25,7 @@ class LogItAdd : AnAction("Insert log") {
         val logVar = variableName?.trim()
 
         val lineToInsert =
-            "console.log(\"${Settings.logItPrefix} $logVar\", $logVar);"
+            "console.log(\"-> $logVar\", $logVar);"
 
         variableName?.let {
             val runnable = {
