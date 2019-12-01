@@ -24,7 +24,9 @@ class LogItAdd : AnAction("Insert log") {
         val variableName = moveCursorToInsertionPoint(editor)
         val logVar = variableName?.trim()
 
-        val lineToInsert =
+        val lineToInsert = if (logVar == "\n")
+            "\nconsole.log(\"-> \", );"
+        else
             "console.log(\"-> $logVar\", $logVar);"
 
         variableName?.let {
@@ -45,7 +47,6 @@ class LogItAdd : AnAction("Insert log") {
                         newOffset + lineToInsert.length
                     }
                 )
-
             }
             WriteCommandAction.runWriteCommandAction(editor.project, runnable)
         }
@@ -83,8 +84,8 @@ class LogItAdd : AnAction("Insert log") {
             valueToLog = element.text.replace(" ", "")
         }
 
-        if (valueToLog?.startsWith("\n\n") == true) {
-            return ""
+        if (valueToLog?.startsWith("\n") == true && element?.parent?.isOneOf("JS:OBJECT_LITERAL") != true) {
+            return "\n"
         }
 
         val block = findBlockForElement(element!!)
@@ -189,6 +190,11 @@ class LogItAdd : AnAction("Insert log") {
         }
 
         return findBlockForElement(element.parent)
+    }
+
+    private fun PsiElement.isOneOf(vararg types: String): Boolean {
+        val type = this.node.elementType.toString()
+        return types.any { it == type }
     }
 }
 

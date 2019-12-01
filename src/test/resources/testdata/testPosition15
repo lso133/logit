@@ -1,0 +1,19 @@
+Api.getShipmentList()
+  .then(response => {
+    for (let i = 0; i < response.data.length; i++) {
+      let data = response.data[i];
+      let shipment = data;
+      if (typeof data.eventsType !== "undefined") {
+        shipment.crane = data.eventsType.search("CRANE") !== -1;
+        shipment.open = data.eventsType.search("OPEN") !== -1;
+        shipment.shock = data.eventsType.search("SHOCK") !== -1;
+      }
+      this.shipments.push(shipment);
+    }<caret>
+    this.isLoading = false;
+  })
+  .catch(error => {
+    console.error(error);
+    this.isLoading = false;
+    this.isError = true;
+  });
