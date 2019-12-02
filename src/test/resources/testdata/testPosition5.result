@@ -7,5 +7,5 @@ func() {
         endingDate: group.endingDate,
         dashed: false
     });
-    console.log("-> <selection></selection>", <selection></selection>);
+    console.log("-> <selection>lastOne</selection>", <selection>lastOne</selection>);
 }

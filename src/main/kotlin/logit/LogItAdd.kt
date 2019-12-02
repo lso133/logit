@@ -1,6 +1,7 @@
 package logit
 
 import com.intellij.lang.javascript.JavascriptLanguage
+import com.intellij.lang.javascript.psi.JSArgumentList
 import com.intellij.lang.javascript.psi.JSIfStatement
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -55,14 +56,6 @@ class LogItAdd : AnAction("Insert log") {
         editor.caretModel.caretsAndSelections =
             listOf(
                 CaretState(
-                    LogicalPosition(logicalPosition.line, logicalPosition.column - lineToInsert.length + 16),
-                    LogicalPosition(logicalPosition.line, logicalPosition.column - lineToInsert.length + 16),
-                    LogicalPosition(
-                        logicalPosition.line,
-                        logicalPosition.column - lineToInsert.length + 16 + variableName.length
-                    )
-                ),
-                CaretState(
                     LogicalPosition(
                         logicalPosition.line,
                         logicalPosition.column - lineToInsert.length + 19 + variableName.length
@@ -75,9 +68,17 @@ class LogItAdd : AnAction("Insert log") {
                         logicalPosition.line,
                         logicalPosition.column - lineToInsert.length + 19 + 2 * variableName.length
                     )
+                ),
+                CaretState(
+                    LogicalPosition(logicalPosition.line, logicalPosition.column - lineToInsert.length + 16),
+                    LogicalPosition(logicalPosition.line, logicalPosition.column - lineToInsert.length + 16),
+                    LogicalPosition(
+                        logicalPosition.line,
+                        logicalPosition.column - lineToInsert.length + 16 + variableName.length
+                    )
                 )
             )
-        println(editor.caretModel.caretsAndSelections)
+        //println(editor.caretModel.caretsAndSelections)
     }
 
     /**
@@ -149,7 +150,7 @@ class LogItAdd : AnAction("Insert log") {
 
             (elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION"
                     && element.parentOfType(JSIfStatement::class) == null)
-                    || parentElementType == "JS:REFERENCE_EXPRESSION"
+                    || (parentElementType == "JS:REFERENCE_EXPRESSION" && elementType != "JS:IDENTIFIER")
                     || parentElementType == "JS:PROPERTY"
             -> {
                 val block = findBlockForElement(element)
@@ -173,7 +174,9 @@ class LogItAdd : AnAction("Insert log") {
                 return findElementToLogForSelection(element.parent)
             }
 
-            element.prevSibling == null -> return null
+            (elementType == "JS:IDENTIFIER"
+                    && element.parentOfType(JSArgumentList::class) == null)
+                    && element.prevSibling == null -> return null
         }
 
         return element

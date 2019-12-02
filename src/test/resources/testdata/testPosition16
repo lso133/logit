@@ -1,0 +1,8 @@
+clickRow(selectedDevice, ro<caret>w) {
+  this.selectedDevice = selectedDevice;
+  this.$refs.gmap.$mapPromise.then(map => {
+    let selectedMarker = this.markers.get(selectedDevice.serial);
+    map.setCenter(selectedMarker.getPosition());
+    map.setZoom(15);
+  });
+},
