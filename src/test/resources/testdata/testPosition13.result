@@ -8,5 +8,5 @@ func() {
         endingDate: group.endingDate,
         dashed: false
     });
-    console.log("-> ", <caret>);
+    console.log("-> <caret>", <caret>);
 }

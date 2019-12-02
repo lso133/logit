@@ -1,4 +1,4 @@
  if (evt && evt.event) {
- console.log("-> ", <caret>);
+ console.log("-> <selection></selection>", <selection></selection>);
         return evt.event.timestamp;
       }

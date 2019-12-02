@@ -1,5 +1,5 @@
  toto;
- console.log("-> evt.event", evt.event);<caret>
+ console.log("-> <selection>evt.event</selection>", <selection>evt.event</selection>);
  if (evt && evt.event) {
         return evt.event.timestamp;
       }

@@ -1,5 +1,6 @@
 toto() {}
-tes<caret>t() {
+test() {
+console.log("-> <selection></selection>", <selection></selection>);
     let variable = null;
 }
 toto() {}

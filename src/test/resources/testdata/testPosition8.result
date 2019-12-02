@@ -1,4 +1,4 @@
 if (!group.events || group.events.length === 0) {
-console.log("-> ", <caret>);
+console.log("-> <selection></selection>", <selection></selection>);
         return [];
       }

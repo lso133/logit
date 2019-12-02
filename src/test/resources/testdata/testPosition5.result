@@ -7,5 +7,5 @@ func() {
         endingDate: group.endingDate,
         dashed: false
     });
-    console.log("-> this.groupedEvents", this.groupedEvents);<caret>
+    console.log("-> <selection></selection>", <selection></selection>);
 }

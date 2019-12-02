@@ -1,5 +1,5 @@
   // if the previous group is a poi, insert an empty group to be the link
-  console.log("-> groupedEvt.length", groupedEvt.length);<caret>
+  console.log("-> <selection>groupedEvt.length</selection>", <selection>groupedEvt.length</selection>);
   if (
     groupedEvt.length >= 1 &&
     groupedEvt[groupedEvt.length - 1].poi &&

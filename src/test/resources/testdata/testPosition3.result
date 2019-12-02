@@ -1,4 +1,4 @@
 test() {
     let variable = null;
-    console.log("-> ", <caret>);
+    console.log("-> <selection></selection>", <selection></selection>);
 }

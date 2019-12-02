@@ -10,7 +10,7 @@ Api.getShipmentList()
       }
       this.shipments.push(shipment);
     }
-    console.log("-> ", <caret>);
+    console.log("-> <selection></selection>", <selection></selection>);
     this.isLoading = false;
   })
   .catch(error => {

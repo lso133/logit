@@ -7,7 +7,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.editor.CaretState
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
@@ -24,32 +26,58 @@ class LogItAdd : AnAction("Insert log") {
         val variableName = moveCursorToInsertionPoint(editor)
         val logVar = variableName?.trim()
 
-        val lineToInsert = if (logVar == "\n")
+        val lineToInsert = if (logVar == "\n") {
             "\nconsole.log(\"-> \", );"
-        else
+        } else
             "console.log(\"-> $logVar\", $logVar);"
 
         variableName?.let {
+            val line2insert = lineToInsert.replace("<CR>", "")
+
             val runnable = {
                 if (variableName != "") {
                     startNewLineHandler.execute(editor, editor.caretModel.primaryCaret, e.dataContext)
                 }
 
-                val newOffset = editor.caretModel.currentCaret.offset
-
-                editor.document.insertString(newOffset, lineToInsert)
-
-                // position the caret after the insertion was done
-                editor.caretModel.moveToOffset(
-                    if (logVar?.isEmpty() == true) {
-                        newOffset + lineToInsert.length - 2
-                    } else {
-                        newOffset + lineToInsert.length
-                    }
-                )
+                val offset = editor.caretModel.currentCaret.offset
+                editor.document.insertString(offset, line2insert)
             }
             WriteCommandAction.runWriteCommandAction(editor.project, runnable)
+
+            positionCaret(editor, line2insert, variableName.replace("<CR>", "").trim())
         }
+    }
+
+    private fun positionCaret(editor: Editor, lineToInsert: String, variableName: String) {
+        val offset = editor.caretModel.currentCaret.offset
+        val logicalPosition = editor.offsetToLogicalPosition(offset + lineToInsert.length)
+
+        editor.caretModel.caretsAndSelections =
+            listOf(
+                CaretState(
+                    LogicalPosition(logicalPosition.line, logicalPosition.column - lineToInsert.length + 16),
+                    LogicalPosition(logicalPosition.line, logicalPosition.column - lineToInsert.length + 16),
+                    LogicalPosition(
+                        logicalPosition.line,
+                        logicalPosition.column - lineToInsert.length + 16 + variableName.length
+                    )
+                ),
+                CaretState(
+                    LogicalPosition(
+                        logicalPosition.line,
+                        logicalPosition.column - lineToInsert.length + 19 + variableName.length
+                    ),
+                    LogicalPosition(
+                        logicalPosition.line,
+                        logicalPosition.column - lineToInsert.length + 19 + variableName.length
+                    ),
+                    LogicalPosition(
+                        logicalPosition.line,
+                        logicalPosition.column - lineToInsert.length + 19 + 2 * variableName.length
+                    )
+                )
+            )
+        println(editor.caretModel.caretsAndSelections)
     }
 
     /**
@@ -65,30 +93,33 @@ class LogItAdd : AnAction("Insert log") {
                 "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
             )
 
-        val valueToLog: String?
+        val valueToLog: String
         val element: PsiElement?
+        val offset: Int
 
         if (editor.selectionModel.hasSelection()) {
-            valueToLog = editor.selectionModel.selectedText
+            val value = editor.selectionModel.selectedText
 
-            val offset = editor.selectionModel.selectionStart
+            offset = editor.selectionModel.selectionStart
 
             element = psiFile.findElementAt(offset)
+
+            valueToLog = value ?: "<CR>"
         } else {
-            val offset = editor.caretModel.currentCaret.offset
+            offset = editor.caretModel.currentCaret.offset
 
             val elementAtCursor = psiFile.findElementAt(offset)
 
-            element = findElementToLogForSelection(elementAtCursor!!) ?: elementAtCursor
+            element = findElementToLogForSelection(elementAtCursor!!)
 
-            valueToLog = element.text.replace(" ", "")
+            valueToLog = element?.text?.replace(" ", "") ?: "<CR>"
         }
 
-        if (valueToLog?.startsWith("\n") == true && element?.parent?.isOneOf("JS:OBJECT_LITERAL") != true) {
+        if (valueToLog.startsWith("\n") && element?.parent?.isOneOf("JS:OBJECT_LITERAL") != true) {
             return "\n"
         }
 
-        val block = findBlockForElement(element!!)
+        val block = findBlockForElement(element ?: psiFile.findElementAt(offset) ?: return null)
 
         when {
             block is JSIfStatement -> {
@@ -98,7 +129,7 @@ class LogItAdd : AnAction("Insert log") {
             block != null -> editor.caretModel.moveToOffset(block.textRange.endOffset)
         }
 
-        return if (block == null) null else valueToLog ?: ""
+        return valueToLog
     }
 
     /**
@@ -119,6 +150,7 @@ class LogItAdd : AnAction("Insert log") {
             (elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION"
                     && element.parentOfType(JSIfStatement::class) == null)
                     || parentElementType == "JS:REFERENCE_EXPRESSION"
+                    || parentElementType == "JS:PROPERTY"
             -> {
                 val block = findBlockForElement(element)
                 return when {
@@ -161,6 +193,7 @@ class LogItAdd : AnAction("Insert log") {
                     || (elementType == "JS:REFERENCE_EXPRESSION" && parentType == "JS:REFERENCE_EXPRESSION")
             -> return element
             elementType == "JS:VARIABLE" -> return element.firstChild
+            elementType == "JS:CALL_EXPRESSION" -> return null
         }
 
         if (element.firstChild == null) {

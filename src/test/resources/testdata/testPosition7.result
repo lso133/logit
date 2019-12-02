@@ -20,7 +20,7 @@ removeNonPertinentEvents(group) {
               index === group.events.length - 1
             ))
       );
-      console.log("-> filtered", filtered);<caret>
+      console.log("-> <selection>filtered</selection>", <selection>filtered</selection>);
 
       return filtered;
     },
