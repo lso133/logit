@@ -1,0 +1,7 @@
+ let j = 1;
+ console.log("-> <selection>rows</selection>", <selection>rows</selection>);
+    if (rows === "something") {
+      let foo = { prop: cols };
+      console.log("-> cols", cols);
+      foo.other = "other";
+    }

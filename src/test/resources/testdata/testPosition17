@@ -1,0 +1,6 @@
+ let j = 1;
+    if (ro<caret>ws === "something") {
+      let foo = { prop: cols };
+      console.log("-> cols", cols);
+      foo.other = "other";
+    }

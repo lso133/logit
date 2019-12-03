@@ -2,6 +2,7 @@ package logit
 
 import com.intellij.lang.javascript.JavascriptLanguage
 import com.intellij.lang.javascript.psi.JSArgumentList
+import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSIfStatement
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -175,7 +176,8 @@ class LogItAdd : AnAction("Insert log") {
             }
 
             (elementType == "JS:IDENTIFIER"
-                    && element.parentOfType(JSArgumentList::class) == null)
+                    && element.parentOfType(JSArgumentList::class) == null
+                    && element.parentOfType(JSCallExpression::class) != null)
                     && element.prevSibling == null -> return null
         }
 
