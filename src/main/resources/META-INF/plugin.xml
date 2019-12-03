@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>org.lso.logit</id>
-    <name>LogItAdd</name>
+    <name>LogIt</name>
     <vendor email="laurent.soulet@gmail.com" url="https://github.com/lso133/logit">Laurent SOULET</vendor>
 
     <description><![CDATA[
@@ -8,19 +8,21 @@
         <p>A Webstorm/Intellij plugin to quickly insert Javascript console.log</p>
         <h3>Features:</h3>
         <ul>
-            <li><b>Insert log</b> - add GitLab autocompleter to IDE Git checkout dialog</li>
-            <li><b>GitLab Share dialog</b> - allows quick import of new projects to GitLab, user can specify namespace and project visibility</li>
-            <li><b>GitLab Merge Request dialog</b> - user can quickly create new merge requests from current branch</li>
-            <li><b>GitLab Merge Request List dialog</b> - user can list and accept all open code reviews</li>
+            <li><b>Insert log</b> - smart Javascript console.log() insertion</li>
+            </br>
+            </br>
+            <p>
+            shortcut (⌥ + L) on Mac and (ALT + L) on others
+            </p>
         </ul>]]>
     </description>
+
+    <idea-version since-build="191" until-build="194.*"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>JavaScript</depends>
-
-    <change-notes>Initial release of the plugin.</change-notes>
 
     <actions>
         <group id="org.lso.logit.LogItActionsGroup" class="logit.LogItActionsGroup" text="Log It"

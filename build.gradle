@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.lso'
-version '0.0.1-SNAPSHOT'
+version 'v1.0'
 
 repositories {
     mavenCentral()
@@ -37,6 +37,6 @@ compileTestKotlin {
 }
 patchPluginXml {
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      v1.0 - initial release.<br>
+"""
 }
