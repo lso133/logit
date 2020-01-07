@@ -1,0 +1,11 @@
+let dateString = formatter
+  .formatToParts(Date.parse(value))
+  .map(({ type, value }) => {<caret>
+    if (type === "literal") {
+      if (value === "/") {
+        return "-";
+      }
+    }
+    return value;
+  })
+  .reduce((string, part) => string + part);

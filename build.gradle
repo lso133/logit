@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.lso'
-version 'v1.0'
+version 'v193.3.1'
 
 repositories {
     mavenCentral()
@@ -37,6 +37,7 @@ compileTestKotlin {
 }
 patchPluginXml {
     changeNotes """
+      v193.3.1 - some corrections when inserting a console.log from an empty line.<br>
       v1.0 - initial release.<br>
 """
 }
