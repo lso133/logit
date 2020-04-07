@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.lso'
-version 'v193.3.1'
+version 'v201.1.1'
 
 repositories {
     mavenCentral()
@@ -22,7 +22,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2019.2.4'
-    alternativeIdePath '/Users/laurent/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/193.5233.80/WebStorm.app'
+    alternativeIdePath '/home/loran/.local/share/JetBrains/Toolbox/apps/WebStorm/ch-0/201.6668.106'
     pluginName 'LogIt'
     plugins 'JavaScriptLanguage', 'CSS'
     type 'IU'
@@ -37,6 +37,7 @@ compileTestKotlin {
 }
 patchPluginXml {
     changeNotes """
+      v201.1.1 - to WebStorm 2020.<br>
       v193.3.1 - some corrections when inserting a console.log from an empty line.<br>
       v1.0 - initial release.<br>
 """
