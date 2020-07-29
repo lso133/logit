@@ -1,8 +1,6 @@
 package logit
 
 import com.intellij.lang.javascript.JavascriptLanguage
-import com.intellij.lang.javascript.psi.JSArgumentList
-import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSIfStatement
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -15,7 +13,6 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
-import com.intellij.psi.util.parentOfType
 
 
 class LogItAdd : AnAction("Insert log") {
@@ -119,7 +116,7 @@ class LogItAdd : AnAction("Insert log") {
       valueToLog = element?.text?.replace(" ", "") ?: "<CR>"
     }
 
-    if (valueToLog.startsWith("\n") && element?.parent?.isOneOf("JS:OBJECT_LITERAL") != true) {
+    if (valueToLog.startsWith("\n") && element?.hasParentOfType("JS:OBJECT_LITERAL", 2) != true) {
       return "\n"
     }
 
@@ -151,8 +148,9 @@ class LogItAdd : AnAction("Insert log") {
         && element.prevSibling.node.elementType.toString() == "JS:DOT"
       -> return findElementToLogForSelection(element.parent)
 
-      (elementType != "JS:IDENTIFIER" && elementType != "JS:REFERENCE_EXPRESSION"
-        && element.parentOfType(JSIfStatement::class) == null)
+      (elementType != "JS:IDENTIFIER"
+        && elementType != "JS:REFERENCE_EXPRESSION"
+        && elementType != "JS:BINARY_EXPRESSION")
         || (parentElementType == "JS:REFERENCE_EXPRESSION" && elementType != "JS:IDENTIFIER")
         || parentElementType == "JS:PROPERTY"
       -> {
@@ -172,14 +170,14 @@ class LogItAdd : AnAction("Insert log") {
       elementType == "JS:IDENTIFIER" && parentElementType == "JS:VARIABLE" -> return findElementToLogForBlock(
         element
       )
-      elementType == "JS:REFERENCE_EXPRESSION" -> {
-        if (element.parentOfType(JSIfStatement::class) != null) return element
+      elementType == "JS:REFERENCE_EXPRESSION"
+        && parentElementType != "JS:BINARY_EXPRESSION" -> {
         return findElementToLogForSelection(element.parent)
       }
 
       (elementType == "JS:IDENTIFIER"
-        && element.parentOfType(JSArgumentList::class) == null
-        && element.parentOfType(JSCallExpression::class) != null)
+        && !element.hasParentOfType("JS:ARGUMENT_LIST", 2)
+        && element.hasParentOfType("JS:CALL_EXPRESSION", 2))
         && element.prevSibling == null -> return null
     }
 
@@ -232,9 +230,14 @@ class LogItAdd : AnAction("Insert log") {
     return findBlockForElement(element.parent)
   }
 
-  private fun PsiElement.isOneOf(vararg types: String): Boolean {
-    val type = this.node.elementType.toString()
-    return types.any { it == type }
+  private fun PsiElement.hasParentOfType(type: String, maxRecursion: Int, recursionLevel: Int = 0): Boolean {
+    return if (this.parent.node.elementType.toString() == type) {
+      true
+    } else {
+      return if (this.parent.node.elementType.toString() != "FILE" && recursionLevel < maxRecursion)
+        this.parent.hasParentOfType(type, maxRecursion, recursionLevel + 1)
+      else false
+    }
   }
 }
 
