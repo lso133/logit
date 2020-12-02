@@ -1,9 +1,9 @@
 <idea-plugin>
-    <id>org.lso.logit</id>
-    <name>LogIt</name>
-    <vendor email="laurent.soulet@gmail.com" url="https://github.com/lso133/logit">Laurent SOULET</vendor>
+  <id>org.lso.logit</id>
+  <name>LogIt</name>
+  <vendor email="laurent.soulet@gmail.com" url="https://github.com/lso133/logit">Laurent SOULET</vendor>
 
-    <description><![CDATA[
+  <description><![CDATA[
         <h2>LogIt</h2>
         <p>A Webstorm/Intellij plugin to quickly insert Javascript console.log</p>
         <h3>Features:</h3>
@@ -15,22 +15,22 @@
             shortcut (⌥ + L) on Mac and (ALT + L) on others
             </p>
         </ul>]]>
-    </description>
+  </description>
+  <idea-version since-build="192" until-build="203.*"/>
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.platform</depends>
+  <depends>JavaScript</depends>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
-    <depends>com.intellij.modules.platform</depends>
-    <depends>JavaScript</depends>
-
-    <actions>
-        <group id="org.lso.logit.LogItActionsGroup" class="org.lso.logit.LogItActionsGroup" text="Log It"
-               description="Generate javascript logs" popup="true">
-          <add-to-group group-id="CodeMenu" anchor="last"/>
-          <action id="org.lso.logit.addLog" class="org.lso.logit.LogItAdd" text="Generate Console.Log"
-                  description="Generate a console.log() for that variable">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt L"/>
-            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta L"/>
-          </action>
-        </group>
-    </actions>
+  <actions>
+    <group id="org.lso.logit.LogItActionsGroup" class="org.lso.logit.LogItActionsGroup" text="Log It"
+           description="Generate javascript logs" popup="true">
+      <add-to-group group-id="CodeMenu" anchor="last"/>
+      <action id="org.lso.logit.addLog" class="org.lso.logit.LogItAdd" text="Generate Console.Log"
+              description="Generate a console.log() for that variable">
+        <keyboard-shortcut keymap="$default" first-keystroke="alt L"/>
+        <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta L"/>
+      </action>
+    </group>
+  </actions>
 </idea-plugin>
