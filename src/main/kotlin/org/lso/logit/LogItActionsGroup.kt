@@ -1,4 +1,4 @@
-package logit
+package org.lso.logit
 
 import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.AnActionEvent

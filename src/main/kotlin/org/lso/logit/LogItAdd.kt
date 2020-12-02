@@ -1,4 +1,4 @@
-package logit
+package org.lso.logit
 
 import com.intellij.lang.javascript.JavascriptLanguage
 import com.intellij.lang.javascript.psi.JSIfStatement

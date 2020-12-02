@@ -2,6 +2,7 @@ package logit
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Test
+import org.lso.logit.LogItAdd
 
 class LogItAddTest : BasePlatformTestCase() {
 

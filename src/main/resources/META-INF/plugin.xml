@@ -17,26 +17,20 @@
         </ul>]]>
     </description>
 
-    <idea-version since-build="191" until-build="202.*"/>
-
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>JavaScript</depends>
 
     <actions>
-        <group id="org.lso.logit.LogItActionsGroup" class="logit.LogItActionsGroup" text="Log It"
+        <group id="org.lso.logit.LogItActionsGroup" class="org.lso.logit.LogItActionsGroup" text="Log It"
                description="Generate javascript logs" popup="true">
-            <add-to-group group-id="CodeMenu" anchor="last"/>
-            <action id="org.lso.logit.addLog" class="logit.LogItAdd" text="Generate Console.Log"
-                    description="Generate a console.log() for that variable">
-                <keyboard-shortcut keymap="$default" first-keystroke="alt L"/>
-                <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta L"/>
-            </action>
-            <!--            <action id="org.lso.logit.deleteLogs" class="logit.LogItDelete" text="Generate Console.Log"-->
-            <!--                    description="Generate a console.log() for that variable">-->
-            <!--                <keyboard-shortcut keymap="$default" first-keystroke="meta U"/>-->
-            <!--            </action>-->
+          <add-to-group group-id="CodeMenu" anchor="last"/>
+          <action id="org.lso.logit.addLog" class="org.lso.logit.LogItAdd" text="Generate Console.Log"
+                  description="Generate a console.log() for that variable">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt L"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta L"/>
+          </action>
         </group>
     </actions>
 </idea-plugin>
