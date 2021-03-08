@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
+import org.lso.logit.settings.LogItSettings
 
 
 class LogItAdd : AnAction("Insert log") {
@@ -25,10 +26,12 @@ class LogItAdd : AnAction("Insert log") {
     val variableName = moveCursorToInsertionPoint(editor)
     val logVar = variableName?.trim()
 
+    val pattern = LogItSettings.instance.pattern
+
     val lineToInsert = if (logVar == "\n") {
-      "\nconsole.log(\"-> \", );"
+      "\n${pattern.replace("$$", "")}"
     } else
-      "console.log(\"-> $logVar\", $logVar);"
+      pattern.replace("$$", "$logVar")
 
     variableName?.let {
       val line2insert = lineToInsert.replace("<CR>", "")

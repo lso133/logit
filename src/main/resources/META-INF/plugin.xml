@@ -22,6 +22,12 @@
   <depends>com.intellij.modules.platform</depends>
   <depends>JavaScript</depends>
 
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationConfigurable parentId="tools" instance="org.lso.logit.settings.LogItSettingsConfigurable"
+                             id="org.lso.logit.settings.LogItSettingsConfigurable" displayName="LogIt"/>
+    <applicationService serviceImplementation="org.lso.logit.settings.LogItSettings"/>
+  </extensions>
+
   <actions>
     <group id="org.lso.logit.LogItActionsGroup" class="org.lso.logit.LogItActionsGroup" text="Log It"
            description="Generate javascript logs" popup="true">
