@@ -7,7 +7,7 @@ apply plugin: "kotlin"
 apply plugin: "org.jetbrains.intellij"
 
 group 'org.lso'
-version 'v2020.3.1'
+version 'v2020.3.11'
 
 sourceCompatibility = 11
 targetCompatibility = 11
@@ -50,6 +50,7 @@ intellij {
 
 patchPluginXml {
     changeNotes """
+      v2020.3.11 - new icon<br>
       v2020.3.1 - adding configuration settings<br>
       v2020.3 - to WebStorm 2020.3<br>
       v2020.2 - to WebStorm 2020.2<br>
