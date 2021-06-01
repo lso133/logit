@@ -7,7 +7,7 @@ apply plugin: "kotlin"
 apply plugin: "org.jetbrains.intellij"
 
 group 'org.lso'
-version 'v2021.1'
+version 'v2021.1.2'
 
 sourceCompatibility = 11
 targetCompatibility = 11
