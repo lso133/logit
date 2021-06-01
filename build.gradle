@@ -50,6 +50,7 @@ intellij {
 
 patchPluginXml {
     changeNotes """
+      v2021.1.2 - replace a deprecated api<br>
       v2021.1 - compatibility with 2021 version and the following ones<br>
       v2020.3.11 - new icon<br>
       v2020.3.1 - adding configuration settings<br>
