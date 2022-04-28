@@ -1,6 +1,6 @@
 toto() {}
 test() {
-console.log("-> <selection></selection>", <selection></selection>);
+console.log("=>(testPosition4:3) <selection></selection>", <selection></selection>);
     let variable = null;
 }
 toto() {}

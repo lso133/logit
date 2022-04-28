@@ -1,4 +1,4 @@
  if (evt && evt.event) {
- console.log("-> <selection></selection>", <selection></selection>);
+ console.log("=>(testPosition9:2) <selection></selection>", <selection></selection>);
         return evt.event.timestamp;
       }

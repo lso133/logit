@@ -16,7 +16,7 @@
         </constraints>
         <properties>
           <text value=""/>
-          <toolTipText value="Use $$ for the insertion point" noi18n="true"/>
+          <toolTipText value="&lt;html&gt;Use $$ for the insertion point&lt;br&gt;&#10;{FP} for file path&lt;br&gt;&#10;{FN} for filename&lt;br&gt;&#10;{LN} for line number&lt;br&gt;&#10;&lt;/html&gt;" noi18n="true"/>
         </properties>
       </component>
       <vspacer id="23236">

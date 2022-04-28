@@ -1,4 +1,4 @@
 if (!group.events || group.events.length === 0) {
-console.log("-> <selection></selection>", <selection></selection>);
+console.log("=>(testPosition8:2) <selection></selection>", <selection></selection>);
         return [];
       }

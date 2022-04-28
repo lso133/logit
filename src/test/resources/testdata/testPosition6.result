@@ -2,6 +2,7 @@ getTranslation(index) {
       let y = this.$store.state.timeline.elements
         .slice(0, index)
         .reduce((acc, value) => acc + value.height, 0);
-        console.log("-> <selection></selection>", <selection></selection>);
+        console.log("=>(testPosition6:5) <selection></selection>", <selection></selection>);
       return "translate(" + this.$store.state.timeline.x + " " + +y + ")";
     }
+

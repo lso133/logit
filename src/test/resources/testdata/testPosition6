@@ -4,3 +4,4 @@ getTranslation(index) {
         .reduce((acc, value) => acc + value.height, 0);<caret>
       return "translate(" + this.$store.state.timeline.x + " " + +y + ")";
     }
+

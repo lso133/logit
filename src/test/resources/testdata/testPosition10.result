@@ -1,5 +1,5 @@
  toto;
- console.log("-> <selection>evt.event</selection>", <selection>evt.event</selection>);
+ console.log("=>(testPosition10:2) <selection>evt.event</selection>", <selection>evt.event</selection>);
  if (evt && evt.event) {
         return evt.event.timestamp;
       }

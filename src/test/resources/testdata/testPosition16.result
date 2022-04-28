@@ -1,5 +1,5 @@
 clickRow(selectedDevice, row) {
-console.log("-> <selection>row</selection>", <selection>row</selection>);
+console.log("=>(testPosition16:2) <selection>row</selection>", <selection>row</selection>);
   this.selectedDevice = selectedDevice;
   this.$refs.gmap.$mapPromise.then(map => {
     let selectedMarker = this.markers.get(selectedDevice.serial);

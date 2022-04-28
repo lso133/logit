@@ -1,7 +1,7 @@
 func() {
     this.groupedEvents.push({
         events: group.events,
-        console.log("-> <caret>", <caret>);
+        console.log("=>(testPosition13:5) <caret>", <caret>);
         poi: group.poi,
         isCurrent: lastOne,
         startingDate: group.startingDate,
