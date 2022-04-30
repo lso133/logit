@@ -32,10 +32,15 @@
     <group id="org.lso.logit.LogItActionsGroup" class="org.lso.logit.LogItActionsGroup" text="Log It"
            description="Generate javascript logs" popup="true">
       <add-to-group group-id="CodeMenu" anchor="last"/>
-      <action id="org.lso.logit.addLog" class="org.lso.logit.LogItAdd" text="Generate Console.Log"
+      <action id="org.lso.logit.addLog" class="org.lso.logit.LogItAdd" text="Insert LogIt's Console.Log"
               description="Generate a console.log() for that variable">
         <keyboard-shortcut keymap="$default" first-keystroke="alt L"/>
         <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta L"/>
+      </action>
+      <action id="org.lso.logit.removeLogs" class="org.lso.logit.LogItRemove" text="Remove LogIt's Console.Log"
+              description="Remove console.log() generate by LogIt plugin">
+        <keyboard-shortcut keymap="$default" first-keystroke="alt shift L"/>
+        <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta shift L"/>
       </action>
     </group>
   </actions>

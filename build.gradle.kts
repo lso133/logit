@@ -4,9 +4,9 @@ plugins {
   // Java support
   id("java")
   // Kotlin support
-  id("org.jetbrains.kotlin.jvm") version "1.6.10"
+  id("org.jetbrains.kotlin.jvm") version "1.6.20"
   // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-  id("org.jetbrains.intellij") version "1.5.2"
+  id("org.jetbrains.intellij") version "1.5.3"
 }
 
 group = "org.lso"
@@ -54,7 +54,7 @@ tasks {
   }
 
   runIde {
-    ideDir.set(file("/Users/laurent/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/213.6777.57/WebStorm.app/Contents"))
+    ideDir.set(file("/Users/laurent/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/221.5080.193/WebStorm.app/Contents"))
   }
 
   patchPluginXml {
