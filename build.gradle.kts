@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.lso"
-version = "v2022.1"
+version = "v2022.2"
 
 // Configure project's dependencies
 repositories {
@@ -59,7 +59,8 @@ tasks {
 
   patchPluginXml {
     changeNotes.set(
-      """
+      """<br>
+      v2022.2 - command to delete LogIt logs from file or project<br>
       v2022.1 - add patterns to add new info in the log line<br>
       v2021.1.2 - replace a deprecated api<br>
       v2021.1 - compatibility with 2021 version and the following ones<br>

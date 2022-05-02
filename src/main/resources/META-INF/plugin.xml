@@ -9,10 +9,13 @@
         <h3>Features:</h3>
         <ul>
             <li><b>Insert log</b> - smart Javascript console.log() insertion</li>
-            </br>
-            </br>
+            <br>
+            <br>
             <p>
-            shortcut (⌥ + L) on Mac and (ALT + L) on others
+            shortcut for insertion (⌥ + L) on Mac and (ALT + L) on others
+            </p>
+            <p>
+            shortcut for deletion (⌥ + ⇧ + L) on Mac and (ALT + ⇧ + L) on others
             </p>
         </ul>]]>
   </description>
@@ -26,6 +29,9 @@
     <applicationConfigurable parentId="tools" instance="org.lso.logit.settings.LogItSettingsConfigurable"
                              id="org.lso.logit.settings.LogItSettingsConfigurable" displayName="LogIt"/>
     <applicationService serviceImplementation="org.lso.logit.settings.LogItSettings"/>
+    <postStartupActivity implementation="org.lso.logit.UpdateNotify"/>
+    <notificationGroup id="org.lso.logit" displayType="STICKY_BALLOON"/>
+    <applicationService serviceImplementation="org.lso.logit.ApplicationServicePlaceholder" id="org.lso.logit"/>
   </extensions>
 
   <actions>

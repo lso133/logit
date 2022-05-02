@@ -13,6 +13,7 @@ internal const val DEFAULT_LOGIT_PATTERN = """console.log("=>({FN}:{LN}) $$", $$
 class LogItSettings : PersistentStateComponent<LogItSettings> {
 
   var pattern: String = DEFAULT_LOGIT_PATTERN
+  var version = "Unknown"
 
   companion object {
     val instance: LogItSettings
