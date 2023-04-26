@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.lso"
-version = "v2023.1"
+version = "v2023.2"
 
 // Configure project's dependencies
 repositories {
@@ -24,7 +24,7 @@ intellij {
 
   // see https://www.jetbrains.com/intellij-repository/releases/
   // and https://www.jetbrains.com/intellij-repository/snapshots/
-  version.set("2023.2")
+  version.set("2023.1")
   type.set("IU")
 
   downloadSources.set(!System.getenv().containsKey("CI"))
