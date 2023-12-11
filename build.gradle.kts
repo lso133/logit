@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.lso"
-version = "v2023.21"
+version = "v2023.3"
 
 // Configure project's dependencies
 repositories {
@@ -24,7 +24,7 @@ intellij {
 
   // see https://www.jetbrains.com/intellij-repository/releases/
   // and https://www.jetbrains.com/intellij-repository/snapshots/
-  version.set("2023.2")
+  version.set("2023.3")
   type.set("IU")
 
   downloadSources.set(!System.getenv().containsKey("CI"))
@@ -51,7 +51,7 @@ tasks {
 
   patchPluginXml {
     sinceBuild.set("223")
-    untilBuild.set("232.*")
+    untilBuild.set("233.*")
   }
 
   publishPlugin {
@@ -65,6 +65,7 @@ tasks {
   patchPluginXml {
     changeNotes.set(
       """<br>
+      v2023.3 - compatibility with 2023.3 version<br>
       v2023.21 - compatibility with 2023.2 version<br>
       v2023.1 - compatibility with 2023 version<br>
       v2022.2 - command to delete LogIt logs from file or project<br>
