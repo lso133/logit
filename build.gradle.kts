@@ -4,13 +4,13 @@ plugins {
   // Java support
   id("java")
   // Kotlin support
-  id("org.jetbrains.kotlin.jvm") version "1.9.0"
+  id("org.jetbrains.kotlin.jvm") version "2.0.0-Beta2"
   // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-  id("org.jetbrains.intellij") version "1.15.0"
+  id("org.jetbrains.intellij") version "1.16.1"
 }
 
 group = "org.lso"
-version = "v2023.21"
+version = "v2023.3"
 
 // Configure project's dependencies
 repositories {
@@ -24,7 +24,7 @@ intellij {
 
   // see https://www.jetbrains.com/intellij-repository/releases/
   // and https://www.jetbrains.com/intellij-repository/snapshots/
-  version.set("2023.2")
+  version.set("2023.3")
   type.set("IU")
 
   downloadSources.set(!System.getenv().containsKey("CI"))
@@ -50,8 +50,8 @@ tasks {
   }
 
   patchPluginXml {
-    sinceBuild.set("223")
-    untilBuild.set("232.*")
+    sinceBuild.set("233")
+    untilBuild.set("233.*")
   }
 
   publishPlugin {
@@ -59,12 +59,13 @@ tasks {
   }
 
   runIde {
-    ideDir.set(file("/Users/laurent/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/232.9921.42/WebStorm.app/Contents"))
+    ideDir.set(file("/Users/laurent/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/233.11799.293/WebStorm.app/Contents"))
   }
 
   patchPluginXml {
     changeNotes.set(
       """<br>
+      v2023.3 - compatibility with 2023.3 version<br>
       v2023.21 - compatibility with 2023.2 version<br>
       v2023.1 - compatibility with 2023 version<br>
       v2022.2 - command to delete LogIt logs from file or project<br>

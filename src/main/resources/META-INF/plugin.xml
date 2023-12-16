@@ -19,7 +19,7 @@
             </p>
         </ul>]]>
   </description>
-  <idea-version since-build="223"/>
+  <idea-version since-build="233" until-build="233.*"/>
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
   <depends>com.intellij.modules.platform</depends>
@@ -29,9 +29,6 @@
     <applicationConfigurable parentId="tools" instance="org.lso.logit.settings.LogItSettingsConfigurable"
                              id="org.lso.logit.settings.LogItSettingsConfigurable" displayName="LogIt"/>
     <applicationService serviceImplementation="org.lso.logit.settings.LogItSettings"/>
-    <postStartupActivity implementation="org.lso.logit.UpdateNotify"/>
-    <notificationGroup id="org.lso.logit" displayType="STICKY_BALLOON"/>
-    <applicationService serviceImplementation="org.lso.logit.ApplicationServicePlaceholder" id="org.lso.logit"/>
   </extensions>
 
   <actions>
