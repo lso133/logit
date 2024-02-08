@@ -4,13 +4,13 @@ plugins {
   // Java support
   id("java")
   // Kotlin support
-  id("org.jetbrains.kotlin.jvm") version "2.0.0-Beta2"
+  id("org.jetbrains.kotlin.jvm") version "2.0.0-Beta3"
   // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-  id("org.jetbrains.intellij") version "1.16.1"
+  id("org.jetbrains.intellij") version "1.17.1"
 }
 
 group = "org.lso"
-version = "v2023.3"
+version = "v2024.1"
 
 // Configure project's dependencies
 repositories {
@@ -36,7 +36,6 @@ intellij {
   plugins.set(listOf("JavaScript"))
 
   sandboxDir.set(project.rootDir.canonicalPath + "/.sandbox")
-
 }
 
 tasks {
@@ -51,7 +50,7 @@ tasks {
 
   patchPluginXml {
     sinceBuild.set("233")
-    untilBuild.set("233.*")
+    untilBuild.set("241.*")
   }
 
   publishPlugin {
@@ -59,12 +58,13 @@ tasks {
   }
 
   runIde {
-    ideDir.set(file("/Users/laurent/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/233.11799.293/WebStorm.app/Contents"))
+    ideDir.set(file("/Users/laurent/Applications/WebStorm 2024.1 EAP.app/Contents"))
   }
 
   patchPluginXml {
     changeNotes.set(
       """<br>
+      v2024.1 - compatibility with 2024.1 version<br>
       v2023.3 - compatibility with 2023.3 version<br>
       v2023.21 - compatibility with 2023.2 version<br>
       v2023.1 - compatibility with 2023 version<br>
