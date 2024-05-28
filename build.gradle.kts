@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.lso"
-version = "v2024.1"
+version = "v2024.2"
 
 // Configure project's dependencies
 repositories {
@@ -24,7 +24,7 @@ intellij {
 
   // see https://www.jetbrains.com/intellij-repository/releases/
   // and https://www.jetbrains.com/intellij-repository/snapshots/
-  version.set("2023.3")
+  version.set("2024.1")
   type.set("IU")
 
   downloadSources.set(!System.getenv().containsKey("CI"))
@@ -50,7 +50,6 @@ tasks {
 
   patchPluginXml {
     sinceBuild.set("233")
-    untilBuild.set("241.*")
   }
 
   publishPlugin {
@@ -58,12 +57,13 @@ tasks {
   }
 
   runIde {
-    ideDir.set(file("/Users/laurent/Applications/WebStorm 2024.1 EAP.app/Contents"))
+    ideDir.set(file("/Users/laurent/Applications/WebStorm.app/Contents/"))
   }
 
   patchPluginXml {
     changeNotes.set(
       """<br>
+      v2024.2 - compatibility with 2024.2 version<br>
       v2024.1 - compatibility with 2024.1 version<br>
       v2023.3 - compatibility with 2023.3 version<br>
       v2023.21 - compatibility with 2023.2 version<br>

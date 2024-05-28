@@ -106,10 +106,10 @@ class LogItAddTest : BasePlatformTestCase() {
   private fun doTest(name: String) {
 
     val file = "/testdata/$name"
-    val jsonRef = javaClass.getResource(file).file
+    val jsonRef = javaClass.getResource(file)?.file
     myFixture.testDataPath = ""
 
-    myFixture.configureByFile(jsonRef)
+    jsonRef?.let { myFixture.configureByFile(it) }
 
     myFixture.testAction(LogItAdd())
 
