@@ -16,7 +16,7 @@ plugins {
 
 tasks.withType<KotlinCompile> {
   compilerOptions {
-    jvmTarget.set(JvmTarget.JVM_21)
+    jvmTarget.set(JvmTarget.JVM_17)
   }
 }
 
@@ -24,14 +24,16 @@ tasks.withType<KotlinCompile> {
 repositories {
   mavenCentral()
 
+
   intellijPlatform {
     defaultRepositories()
+    snapshots()
   }
 }
 
 dependencies {
   intellijPlatform {
-    intellijIdeaUltimate("2024.2")
+    intellijIdeaUltimate("LATEST-EAP-SNAPSHOT", useInstaller = false)
     bundledPlugin("JavaScript")
     instrumentationTools()
     pluginVerifier()
@@ -47,7 +49,7 @@ intellijPlatform {
   pluginConfiguration {
     group = "org.lso"
     name.set("LogIt")
-    version.set("2024.21")
+    version.set("2024.3")
   }
   pluginVerification {
     failureLevel = VerifyPluginTask.FailureLevel.ALL
@@ -61,8 +63,8 @@ intellijPlatform {
       select {
         types = listOf(IntelliJPlatformType.WebStorm)
         channels = listOf(ProductRelease.Channel.RELEASE)
-        sinceBuild = "232"
-        untilBuild = "242.*"
+        sinceBuild = "242"
+        untilBuild = "243.*"
       }
     }
   }
@@ -74,13 +76,14 @@ intellijPlatform {
   tasks {
 
     withType<JavaCompile> {
-      sourceCompatibility = "21"
-      targetCompatibility = "21"
+      sourceCompatibility = "17"
+      targetCompatibility = "17"
     }
 
     patchPluginXml {
       changeNotes.set(
         """<br>
+      v2024.3 - compatibility with 2024.3 version<br>
       v2024.21 - compatibility with 2024.202 version<br>
       v2024.2 - compatibility with 2024.2 version<br>
       v2024.1 - compatibility with 2024.1 version<br>
