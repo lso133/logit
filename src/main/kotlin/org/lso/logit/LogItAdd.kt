@@ -17,7 +17,8 @@ import org.lso.logit.settings.LogItSettings
 class LogItAdd : AnAction("Insert log") {
   override fun actionPerformed(e: AnActionEvent) {
     // Editor is known to exist from update, so it's not null
-    val editor = e.getRequiredData(CommonDataKeys.EDITOR)
+    val editor = e.getData(CommonDataKeys.EDITOR)
+    editor ?: throw IllegalStateException("Editor cannot be null")
     val actionManager = EditorActionManager.getInstance()
     val startNewLineHandler = actionManager.getActionHandler(IdeActions.ACTION_EDITOR_START_NEW_LINE)
 

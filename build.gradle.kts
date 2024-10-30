@@ -9,14 +9,14 @@ plugins {
   // Java support
   id("java")
   // Kotlin support
-  id("org.jetbrains.kotlin.jvm") version "2.0.20-RC2"
+  id("org.jetbrains.kotlin.jvm") version "2.0.21"
   // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-  id("org.jetbrains.intellij.platform") version "2.0.1"
+  id("org.jetbrains.intellij.platform") version "2.1.0"
 }
 
 tasks.withType<KotlinCompile> {
   compilerOptions {
-    jvmTarget.set(JvmTarget.JVM_17)
+    jvmTarget.set(JvmTarget.JVM_19)
   }
 }
 
@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
   intellijPlatform {
-    intellijIdeaUltimate("LATEST-EAP-SNAPSHOT", useInstaller = false)
+    webstorm("2024.2.4", useInstaller = false)
     bundledPlugin("JavaScript")
     instrumentationTools()
     pluginVerifier()
@@ -49,7 +49,7 @@ intellijPlatform {
   pluginConfiguration {
     group = "org.lso"
     name.set("LogIt")
-    version.set("2024.3")
+    version.set("2024.31")
   }
   pluginVerification {
     failureLevel = VerifyPluginTask.FailureLevel.ALL
@@ -74,15 +74,15 @@ intellijPlatform {
   }
 
   tasks {
-
     withType<JavaCompile> {
-      sourceCompatibility = "17"
-      targetCompatibility = "17"
+      sourceCompatibility = "19"
+      targetCompatibility = "19"
     }
 
     patchPluginXml {
       changeNotes.set(
         """<br>
+      v2024.31 - remove deprecated functions<br>
       v2024.3 - compatibility with 2024.3 version<br>
       v2024.21 - compatibility with 2024.202 version<br>
       v2024.2 - compatibility with 2024.2 version<br>

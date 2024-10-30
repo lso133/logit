@@ -16,7 +16,8 @@ class LogItRemove : AnAction("Remove LogIt's Logs") {
     if (!dlg.showAndGet()) return
 
     val project = e.getData(CommonDataKeys.PROJECT)!!
-    val editor = e.getRequiredData(CommonDataKeys.EDITOR)
+    val editor = e.getData(CommonDataKeys.EDITOR)
+    editor ?: throw IllegalStateException("Editor cannot be null")
 
     val patternToReplace = ".*" + LogItSettings.instance.pattern.run {
       replace("\\", "\\\\")
