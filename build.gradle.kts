@@ -49,7 +49,7 @@ intellijPlatform {
   pluginConfiguration {
     group = "org.lso"
     name.set("LogIt")
-    version.set("2024.31")
+    version.set("2025.1")
   }
   pluginVerification {
     failureLevel = VerifyPluginTask.FailureLevel.ALL
@@ -64,7 +64,7 @@ intellijPlatform {
         types = listOf(IntelliJPlatformType.WebStorm)
         channels = listOf(ProductRelease.Channel.RELEASE)
         sinceBuild = "242"
-        untilBuild = "243.*"
+        untilBuild = "251.*"
       }
     }
   }
@@ -82,6 +82,7 @@ intellijPlatform {
     patchPluginXml {
       changeNotes.set(
         """<br>
+      v2025.1 - compatibility with 2025.1 version<br>
       v2024.31 - remove deprecated functions<br>
       v2024.3 - compatibility with 2024.3 version<br>
       v2024.21 - compatibility with 2024.202 version<br>
