@@ -11,7 +11,7 @@ plugins {
   // Kotlin support
   id("org.jetbrains.kotlin.jvm") version "2.0.21"
   // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-  id("org.jetbrains.intellij.platform") version "2.1.0"
+  id("org.jetbrains.intellij.platform") version "2.6.0"
 }
 
 tasks.withType<KotlinCompile> {
@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
   intellijPlatform {
-    webstorm("2024.2.4", useInstaller = false)
+    webstorm("2025.1.2", useInstaller = false)
     bundledPlugin("JavaScript")
     instrumentationTools()
     pluginVerifier()
@@ -49,7 +49,7 @@ intellijPlatform {
   pluginConfiguration {
     group = "org.lso"
     name.set("LogIt")
-    version.set("2025.1")
+    version.set("2025.1.2")
   }
   pluginVerification {
     failureLevel = VerifyPluginTask.FailureLevel.ALL
@@ -58,7 +58,7 @@ intellijPlatform {
     teamCityOutputFormat = false
     subsystemsToCheck = VerifyPluginTask.Subsystems.ALL
     ides {
-      ide(IntelliJPlatformType.WebStorm, "2024.2")
+      ide(IntelliJPlatformType.WebStorm, "2025.1")
       recommended()
       select {
         types = listOf(IntelliJPlatformType.WebStorm)

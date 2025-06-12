@@ -106,7 +106,7 @@ class LogItAdd : AnAction("Insert log") {
     // parse the file as a simple JavaScript file
     val psiFile =
       PsiFileFactory.getInstance(editor.project).createFileFromText(
-        "dummy.js", JavascriptLanguage.INSTANCE, editor.document.text
+        "dummy.js", JavascriptLanguage, editor.document.text
       )
 
     val valueToLog: String
